@@ -4,14 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import MarkdownIt from 'markdown-it'
-import markdownHighlight from 'markdown-it-highlightjs'
-import highlight from 'highlight.js'
-import markdownKatex from '@traptitech/markdown-it-katex'
 import { X, SquarePen, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
+import Magicdown from '@/components/Magicdown'
 import Button from '@/components/Button'
 import { useMessageStore } from '@/store/chat'
 import { useSettingStore } from '@/store/setting'
@@ -74,53 +71,12 @@ function SystemInstruction() {
     }
   }, [form])
 
-  const render = useCallback((content: string) => {
-    const md: MarkdownIt = MarkdownIt({
-      linkify: true,
-      breaks: true,
-    })
-      .use(markdownHighlight)
-      .use(markdownKatex)
-
-    const mathLineRender = md.renderer.rules.math_inline!
-    md.renderer.rules.math_inline = (...params) => {
-      return `
-          <div class="katex-inline-warpper">
-            ${mathLineRender(...params)}
-          </div>
-        `
-    }
-    const mathBlockRender = md.renderer.rules.math_block!
-    md.renderer.rules.math_block = (...params) => {
-      return `
-          <div class="katex-block-warpper">
-            ${mathBlockRender(...params)}
-          </div>
-        `
-    }
-    const highlightRender = md.renderer.rules.fence!
-    md.renderer.rules.fence = (...params) => {
-      const [tokens, idx] = params
-      const token = tokens[idx]
-      const lang = token.info.trim()
-      return `
-          <div class="hljs-warpper">
-            <div class="info">
-              <span class="lang">${upperFirst(lang)}</span>
-            </div>
-            ${highlight.getLanguage(lang) ? highlightRender(...params) : null}
-          </div>
-        `
-    }
-    return md.render(content)
-  }, [])
-
   useEffect(() => {
-    setHtml(render(systemInstruction))
+    setHtml(systemInstruction)
     return () => {
       setHtml('')
     }
-  }, [systemInstruction, render])
+  }, [systemInstruction])
 
   return (
     <Card>
@@ -185,7 +141,7 @@ function SystemInstruction() {
               </form>
             </Form>
           ) : (
-            <div className="prose break-all text-sm leading-6" dangerouslySetInnerHTML={{ __html: html }}></div>
+            <Magicdown>{html}</Magicdown>
           )}
         </CardContent>
       </div>

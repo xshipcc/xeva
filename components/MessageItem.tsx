@@ -3,10 +3,6 @@ import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Lightbox from 'yet-another-react-lightbox'
 import LightboxFullscreen from 'yet-another-react-lightbox/plugins/fullscreen'
-import MarkdownIt from 'markdown-it'
-import markdownHighlight from 'markdown-it-highlightjs'
-import markdownKatex from '@traptitech/markdown-it-katex'
-import Clipboard from 'clipboard'
 import {
   User,
   Bot,
@@ -24,6 +20,7 @@ import {
 import { EdgeSpeech } from '@xiangfa/polly'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import Magicdown from '@/components/Magicdown'
 import BubblesLoading from '@/components/BubblesLoading'
 import FileList from '@/components/FileList'
 import EditableArea from '@/components/EditableArea'
@@ -43,32 +40,10 @@ import { OFFICAL_PLUGINS } from '@/plugins'
 import { upperFirst, isFunction, find, findLastIndex, isUndefined } from 'lodash-es'
 
 import 'katex/dist/katex.min.css'
-import 'highlight.js/styles/a11y-light.css'
 import 'yet-another-react-lightbox/styles.css'
 
 interface Props extends Message {
   onRegenerate?: (id: string) => void
-}
-
-const registerCopy = (className: string) => {
-  const clipboard = new Clipboard(className, {
-    text: (trigger) => {
-      return decodeURIComponent(trigger.getAttribute('data-clipboard-text') || '')
-    },
-  })
-  return clipboard
-}
-
-function filterMarkdown(text: string): string {
-  const md = new MarkdownIt()
-  // Convert Markdown to HTML using markdown-it
-  const html = md.render(text)
-  // Convert HTML to DOM objects using DOMParser
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(html, 'text/html')
-  // Get filtered text content
-  const filteredText = doc.body.textContent || ''
-  return filteredText
 }
 
 function mergeSentences(sentences: string[], sentenceLength = 20): string[] {
@@ -178,7 +153,7 @@ function MessageItem(props: Props) {
 
   const handleSpeak = useCallback(async (content: string) => {
     const { lang, ttsLang, ttsVoice } = useSettingStore.getState()
-    const sentences = mergeSentences(sentenceSegmentation(filterMarkdown(content), lang), 100)
+    const sentences = mergeSentences(sentenceSegmentation(content, lang), 100)
     const edgeSpeech = new EdgeSpeech({ locale: ttsLang })
     const audioStream = new AudioStream()
 
@@ -198,89 +173,6 @@ function MessageItem(props: Props) {
     setLightboxIndex(index)
     setShowLightbox(true)
   }, [])
-
-  const render = useCallback(
-    (content: string) => {
-      const md: MarkdownIt = MarkdownIt({
-        linkify: true,
-        breaks: true,
-      })
-        .use(markdownHighlight)
-        .use(markdownKatex)
-
-      // Save the original text rule
-      const defaultTextRules = md.renderer.rules.text!
-
-      // Rewrite the `strong` rule to adapt to Gemini generation grammar
-      md.renderer.rules.text = (tokens, idx, options, env, self) => {
-        const token = tokens[idx]
-        const content = token.content
-
-        // Check whether it conforms to the `strong` format
-        const match = content.match(/^\*\*(.+?)\*\*(.+)/)
-        if (match) {
-          return `<b>${match[1]}</b>${match[2]}`
-        }
-
-        // If the format is not met, the original `strong` rule is called
-        return defaultTextRules(tokens, idx, options, env, self)
-      }
-
-      md.renderer.rules.table_open = function (tokens, idx, options) {
-        return `<div style="overflow-x:auto;"><table>`
-      }
-
-      md.renderer.rules.table_close = function (tokens, idx, options) {
-        return '</table></div>'
-      }
-
-      const mathLineRender = md.renderer.rules.math_inline!
-      md.renderer.rules.math_inline = (...params) => {
-        const [tokens, idx] = params
-        const token = tokens[idx]
-        return `
-          <div class="katex-inline-warpper">
-            <span class="copy copy-katex-inline" data-clipboard-text="${encodeURIComponent(token.content)}">${t(
-              'copy',
-            )}</span>
-            ${mathLineRender(...params)}
-          </div>
-        `
-      }
-      const mathBlockRender = md.renderer.rules.math_block!
-      md.renderer.rules.math_block = (...params) => {
-        const [tokens, idx] = params
-        const token = tokens[idx]
-        return `
-          <div class="katex-block-warpper">
-            <span class="copy copy-katex-block" data-clipboard-text="${encodeURIComponent(token.content)}">${t(
-              'copy',
-            )}</span>
-            ${mathBlockRender(...params)}
-          </div>
-        `
-      }
-      const highlightRender = md.renderer.rules.fence!
-      md.renderer.rules.fence = (...params) => {
-        const [tokens, idx] = params
-        const token = tokens[idx]
-        const lang = token.info.trim()
-        return `
-          <div class="hljs-warpper">
-            <div class="info">
-              <span class="lang">${upperFirst(lang)}</span>
-              <span class="copy copy-code" data-clipboard-text="${encodeURIComponent(token.content)}">${t(
-                'copy',
-              )}</span>
-            </div>
-            ${highlightRender(...params)}
-          </div>
-        `
-      }
-      return md.render(content)
-    },
-    [t],
-  )
 
   const MessageAvatar = () => {
     if (role === 'user') {
@@ -406,18 +298,12 @@ function MessageItem(props: Props) {
                       </span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div
-                        className="prose chat-content break-words"
-                        dangerouslySetInnerHTML={{ __html: thoughtsHtml }}
-                      ></div>
+                      <Magicdown>{thoughtsHtml}</Magicdown>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
               ) : null}
-              <div
-                className="prose chat-content break-words text-base leading-8"
-                dangerouslySetInnerHTML={{ __html: html }}
-              ></div>
+              <Magicdown>{html}</Magicdown>
               <div
                 className={cn(
                   'flex gap-1 text-right opacity-0 transition-opacity duration-300 group-hover:opacity-100',
@@ -469,38 +355,23 @@ function MessageItem(props: Props) {
     const textParts = parts.filter((item) => !isUndefined(item.text))
     if (role === 'model' && textParts.length === 2) {
       if (textParts[0].text) {
-        setThoughtsHtml(render(textParts[0].text))
+        setThoughtsHtml(textParts[0].text)
       }
       if (textParts[1].text) {
         setHasTextContent(true)
-        setHtml(render(textParts[1].text))
+        setHtml(textParts[1].text)
       }
     } else {
       const messageParts: string[] = []
       parts.forEach(async (part) => {
         if (part.text) {
-          messageParts.push(render(part.text))
+          messageParts.push(part.text)
           setHasTextContent(true)
         }
       })
       setHtml(messageParts.join(''))
     }
-    const copyKatexInline = registerCopy('.copy-katex-inline')
-    const copyKatexBlock = registerCopy('.copy-katex-block')
-    const copyCode = registerCopy('.copy-code')
-
-    const copyContent = new Clipboard(`.copy-${id}`, {
-      text: () => content,
-    })
-    return () => {
-      setHtml('')
-      setThoughtsHtml('')
-      copyKatexInline.destroy()
-      copyKatexBlock.destroy()
-      copyCode.destroy()
-      copyContent.destroy()
-    }
-  }, [id, role, content, parts, attachments, render])
+  }, [id, role, content, parts, attachments])
 
   return (
     <>
