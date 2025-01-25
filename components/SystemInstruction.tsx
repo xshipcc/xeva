@@ -70,7 +70,7 @@ function SystemInstruction() {
       const { done, value } = await reader.read()
       if (done) break
       newContent += new TextDecoder().decode(value)
-      form.setValue('content', content)
+      form.setValue('content', newContent)
     }
   }, [form])
 

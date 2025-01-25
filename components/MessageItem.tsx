@@ -110,8 +110,9 @@ function MessageItem(props: Props) {
       if (part.fileData && attachments) {
         for (const attachment of attachments) {
           if (attachment.metadata?.uri === part.fileData.fileUri) {
-            if (part.fileData?.mimeType.startsWith('image/') && attachment.dataUrl) {
-              imageList.push(attachment.dataUrl)
+            if (part.fileData?.mimeType.startsWith('image/')) {
+              if (attachment.dataUrl) imageList.push(attachment.dataUrl)
+              if (attachment.preview) imageList.push(attachment.preview)
             }
           }
         }

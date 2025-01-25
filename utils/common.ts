@@ -106,6 +106,7 @@ export function hasUploadFiles(messages: Message[]): boolean {
 export function getRandomKey(apiKey: string, useUploadKey = false): string {
   const apiKeyList = apiKey.split(',')
   if (apiKeyList[0].startsWith('AI') && apiKeyList[0].length === 39) {
+    if (apiKeyList.length === 1) return apiKeyList[0]
     return useUploadKey ? apiKeyList[0] : shuffleArray(apiKeyList)[0]
   } else {
     return apiKey
