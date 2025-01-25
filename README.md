@@ -146,6 +146,7 @@ You can star or watch this project or follow author to get release notifications
 #### `GEMINI_API_KEY` (optional)
 
 Your Gemini api key. If you need to `enable` the server api, this is required.
+Supports multiple keys, each key is separated by `,`, i.e. `key1,key2,key3`
 
 #### `GEMINI_API_BASE_URL` (optional)
 

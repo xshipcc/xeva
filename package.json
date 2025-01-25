@@ -1,6 +1,6 @@
 {
   "name": "gemini-next-chat",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "private": true,
   "author": "Amery2010 <amery@xiangfa.org>",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@serwist/next": "^9.0.10",
     "@traptitech/markdown-it-katex": "^3.6.0",
-    "@xiangfa/polly": "^0.4.2",
+    "@xiangfa/polly": "^0.4.3",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "clipboard": "^2.0.11",

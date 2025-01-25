@@ -95,8 +95,8 @@ declare global {
     name: string
     mimeType: string
     size: number
-    preview?: string
     metadata?: FileMetadata
+    dataUrl?: string
     status: 'STATE_UNSPECIFIED' | 'PROCESSING' | 'ACTIVE' | 'FAILED'
   }
 

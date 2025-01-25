@@ -146,6 +146,7 @@
 #### `GEMINI_API_KEY`（可选）
 
 您的 Gemini api 密钥。 如果您需要“启用”服务器 api，这是必需的。
+支持多个 key，每个 key 之间使用 `,` 分隔，即 `key1,key2,key3`
 
 #### `GEMINI_API_BASE_URL`（可选）
 

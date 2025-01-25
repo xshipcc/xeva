@@ -98,3 +98,16 @@ export function downloadFile(content: string, filename: string, fileType: string
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
 }
+
+export function hasUploadFiles(messages: Message[]): boolean {
+  return messages.some((message) => message.parts.some((part) => part.fileData))
+}
+
+export function getRandomKey(apiKey: string, useUploadKey = false): string {
+  const apiKeyList = apiKey.split(',')
+  if (apiKeyList[0].startsWith('AI') && apiKeyList[0].length === 39) {
+    return useUploadKey ? apiKeyList[0] : shuffleArray(apiKeyList)[0]
+  } else {
+    return apiKey
+  }
+}

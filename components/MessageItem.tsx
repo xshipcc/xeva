@@ -102,21 +102,21 @@ function MessageItem(props: Props) {
   const [showLightbox, setShowLightbox] = useState<boolean>(false)
   const [lightboxIndex, setLightboxIndex] = useState<number>(0)
   const fileList = useMemo(() => {
-    return attachments ? attachments.filter((item) => !item.metadata?.mimeType.startsWith('image/')) : []
+    return attachments ? attachments.filter((item) => !item.mimeType.startsWith('image/')) : []
   }, [attachments])
   const inlineImageList = useMemo(() => {
     const imageList: string[] = []
     parts.forEach(async (part) => {
-      if (part.inlineData?.mimeType.startsWith('image/')) {
-        imageList.push(`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`)
-      } else if (part.fileData && attachments) {
+      if (part.fileData && attachments) {
         for (const attachment of attachments) {
           if (attachment.metadata?.uri === part.fileData.fileUri) {
-            if (part.fileData?.mimeType.startsWith('image/') && attachment.preview) {
-              imageList.push(attachment.preview)
+            if (part.fileData?.mimeType.startsWith('image/') && attachment.dataUrl) {
+              imageList.push(attachment.dataUrl)
             }
           }
         }
+      } else if (part.inlineData?.mimeType.startsWith('image/')) {
+        imageList.push(`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`)
       }
     })
     return imageList

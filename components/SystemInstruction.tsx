@@ -50,12 +50,12 @@ function SystemInstruction() {
   }, [instruction, setSystemInstructionEditMode])
 
   const optimizeAssistantPrompt = useCallback(async () => {
-    if (systemInstruction === '') return false
-    const { apiKey, apiProxy, model, password } = useSettingStore.getState()
+    const { content } = form.getValues()
+    if (content === '') return false
+    const { apiKey, apiProxy, password } = useSettingStore.getState()
     const config: RequestProps = {
       apiKey,
-      model,
-      content: systemInstruction,
+      content,
     }
     if (apiKey !== '') {
       config.baseUrl = apiProxy || GEMINI_API_BASE_URL
@@ -64,15 +64,15 @@ function SystemInstruction() {
       config.baseUrl = '/api/google'
     }
     const readableStream = await optimizePrompt(config)
-    let content = ''
+    let newContent = ''
     const reader = readableStream.getReader()
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
-      content += new TextDecoder().decode(value)
+      newContent += new TextDecoder().decode(value)
       form.setValue('content', content)
     }
-  }, [form, systemInstruction])
+  }, [form])
 
   const render = useCallback((content: string) => {
     const md: MarkdownIt = MarkdownIt({
