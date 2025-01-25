@@ -104,7 +104,7 @@ A cross-platform application client that supports a permanent menu bar, doubling
 - Support plugins, with built-in Web search, Web reader, Arxiv search, Weather and other practical plugins
 - Conversation list, so you can keep track of important conversations or discuss different topics with Gemini
 - Artifact support, allowing you to modify the conversation content more elegantly
-- Full Markdown support: KaTex formulas, code highlighting, and more
+- Full Markdown support: KaTex formulas, code highlighting, Mermaid charts, etc.
 - Automatically compress contextual chat records to save Tokens while supporting very long conversations
 - Privacy and security, all data is saved locally in the user's browser
 - Support PWA, can run as an application

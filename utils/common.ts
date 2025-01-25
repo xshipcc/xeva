@@ -113,7 +113,7 @@ export function getRandomKey(apiKey: string, useUploadKey = false): string {
   }
 }
 
-export function convertSvgToImage(svg?: Node) {
+export function convertSvgToImage(svg: ChildNode | null) {
   if (svg) {
     const text = new XMLSerializer().serializeToString(svg)
     return downloadFile(text, 'Mermaid', 'image/svg+xml')
