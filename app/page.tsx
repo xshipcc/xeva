@@ -1004,7 +1004,7 @@ export default function Home() {
               onChange={(ev) => {
                 setContent(ev.target.value)
                 setTextareaHeight(ev.target.value === '' ? TEXTAREA_DEFAULT_HEIGHT : ev.target.scrollHeight)
-                scrollToBottom()
+                if (messages.length > 1) scrollToBottom()
               }}
               onKeyDown={handleKeyDown}
             />
