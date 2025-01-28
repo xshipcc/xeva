@@ -18,6 +18,7 @@ import {
   Blocks,
 } from 'lucide-react'
 import { EdgeSpeech } from '@xiangfa/polly'
+import copy from 'copy-to-clipboard'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import Magicdown from '@/components/Magicdown'
@@ -146,10 +147,11 @@ function MessageItem(props: Props) {
 
   const handleCopy = useCallback(() => {
     setIsCopyed(true)
+    copy(content)
     setTimeout(() => {
       setIsCopyed(false)
-    }, 2000)
-  }, [])
+    }, 1200)
+  }, [content])
 
   const handleSpeak = useCallback(async (content: string) => {
     const { lang, ttsLang, ttsVoice } = useSettingStore.getState()
