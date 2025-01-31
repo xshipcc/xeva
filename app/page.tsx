@@ -21,6 +21,8 @@ import { useTranslation } from 'react-i18next'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useSidebar } from '@/components/ui/sidebar'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ToastAction } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/use-toast'
 import SystemInstruction from '@/components/SystemInstruction'
 import AttachmentArea from '@/components/AttachmentArea'
 import Button from '@/components/Button'
@@ -68,6 +70,7 @@ const PluginList = dynamic(() => import('@/components/PluginList'))
 
 export default function Home() {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const { state: sidebarState, toggleSidebar } = useSidebar()
   const siriWaveRef = useRef<HTMLDivElement>(null)
   const scrollAreaBottomRef = useRef<HTMLDivElement>(null)
@@ -643,10 +646,20 @@ export default function Home() {
   )
 
   const handleCleanMessage = useCallback(() => {
-    const { clear: clearMessage } = useMessageStore.getState()
+    const { clear: clearMessage, backup, restore } = useMessageStore.getState()
+    const conversation = backup()
     clearMessage()
     setErrorMessage('')
-  }, [])
+    toast({
+      title: 'Chat content cleared',
+      action: (
+        <ToastAction altText="Undo" onClick={() => restore(conversation)}>
+          Undo
+        </ToastAction>
+      ),
+      duration: 3600,
+    })
+  }, [toast])
 
   const updateTalkMode = useCallback((type: 'chat' | 'voice') => {
     const { update } = useSettingStore.getState()

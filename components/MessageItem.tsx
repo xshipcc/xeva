@@ -1,4 +1,5 @@
 'use client'
+import dynamic from 'next/dynamic'
 import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Lightbox from 'yet-another-react-lightbox'
@@ -21,7 +22,6 @@ import { EdgeSpeech } from '@xiangfa/polly'
 import copy from 'copy-to-clipboard'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import Magicdown from '@/components/Magicdown'
 import BubblesLoading from '@/components/BubblesLoading'
 import FileList from '@/components/FileList'
 import EditableArea from '@/components/EditableArea'
@@ -38,10 +38,12 @@ import AudioStream from '@/utils/AudioStream'
 import { sentenceSegmentation } from '@/utils/common'
 import { cn } from '@/utils'
 import { OFFICAL_PLUGINS } from '@/plugins'
-import { upperFirst, isFunction, find, findLastIndex, isUndefined } from 'lodash-es'
+import { isFunction, find, findLastIndex, isUndefined } from 'lodash-es'
 
 import 'katex/dist/katex.min.css'
 import 'yet-another-react-lightbox/styles.css'
+
+const Magicdown = dynamic(() => import('@/components/Magicdown'))
 
 interface Props extends Message {
   onRegenerate?: (id: string) => void
@@ -323,15 +325,11 @@ function MessageItem(props: Props) {
                     <IconButton title={t('edit')} onClick={() => setIsEditing(true)}>
                       <PencilLine className="h-4 w-4" />
                     </IconButton>
-                    <IconButton title={t('delete')} onClick={() => handleDelete(id)}>
-                      <Eraser className="h-4 w-4" />
-                    </IconButton>
-                  </>
-                ) : null}
-                {hasTextContent ? (
-                  <>
                     <IconButton title={t('copy')} className={`copy-${id}`} onClick={() => handleCopy()}>
                       {isCopyed ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </IconButton>
+                    <IconButton title={t('delete')} onClick={() => handleDelete(id)}>
+                      <Eraser className="h-4 w-4" />
                     </IconButton>
                     <IconButton title={t('speak')} onClick={() => handleSpeak(content)}>
                       <Volume2 className="h-4 w-4" />

@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import { useMemo, useState, memo } from 'react'
 import Markdown, { type Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -6,7 +7,6 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import copy from 'copy-to-clipboard'
 import { Copy, CopyCheck } from 'lucide-react'
-import Mermaid from './Mermaid'
 import Button from '@/components/Button'
 import { langAlias } from '@/constant/highlight'
 import { clsx } from 'clsx'
@@ -14,6 +14,8 @@ import { omit, capitalize, get, isNumber } from 'lodash-es'
 
 import './style.css'
 import 'katex/dist/katex.min.css'
+
+const Mermaid = dynamic(() => import('./Mermaid'))
 
 function getLangAlias(lang: string): string {
   return get(langAlias, lang, capitalize(lang))
@@ -74,14 +76,14 @@ function Magicdown({ children: content, className, ...rest }: Options) {
                     )}
                   </Button>
                 </div>
-                <code {...rest} className={clsx('rounded-b', className)}>
+                <code {...rest} className={clsx('break-words rounded-b', className)}>
                   {children}
                 </code>
               </>
             )
           } else {
             return (
-              <code {...rest} className={className}>
+              <code {...rest} className={clsx('break-words', className)}>
                 {children}
               </code>
             )

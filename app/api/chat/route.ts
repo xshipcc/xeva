@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
   const body = await req.json()
   const model = searchParams.get('model')
-  const version = model?.includes('-thinking') ? 'v1alpha' : 'v1beta'
+  const version = model?.includes('thinking') ? 'v1alpha' : 'v1beta'
   const apiKey = getRandomKey(geminiApiKey, hasUploadFiles(body.contents))
 
   try {
