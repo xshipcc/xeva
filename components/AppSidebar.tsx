@@ -85,25 +85,6 @@ function ConversationItem(props: Props) {
   const [editTitleMode, setEditTitleMode] = useState<boolean>(false)
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
 
-  const handleSelect = useCallback((id: string) => {
-    const { currentId, query, addOrUpdate, setCurrentId } = useConversationStore.getState()
-    const { backup, restore } = useMessageStore.getState()
-    const oldConversation = backup()
-    addOrUpdate(currentId, oldConversation)
-
-    const newConversation = query(id)
-    setCurrentId(id)
-    restore(newConversation)
-  }, [])
-
-  const editTitle = useCallback(
-    (text: string) => {
-      setTitle(text)
-      setEditTitleMode(false)
-    },
-    [setTitle],
-  )
-
   const handleSummaryTitle = useCallback(async (id: string) => {
     const { lang, apiKey, apiProxy, password } = useSettingStore.getState()
     const { currentId, query, addOrUpdate } = useConversationStore.getState()
@@ -132,6 +113,30 @@ function ConversationItem(props: Props) {
     addOrUpdate(id, { ...conversation, title: content })
     if (id === currentId) setTitle(content)
   }, [])
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      const { currentId, query, addOrUpdate, setCurrentId } = useConversationStore.getState()
+      const { title, backup, restore } = useMessageStore.getState()
+      const oldConversation = backup()
+      addOrUpdate(currentId, oldConversation)
+
+      const newConversation = query(id)
+      setCurrentId(id)
+      restore(newConversation)
+
+      if (!title && currentId !== 'default') handleSummaryTitle(currentId)
+    },
+    [handleSummaryTitle],
+  )
+
+  const editTitle = useCallback(
+    (text: string) => {
+      setTitle(text)
+      setEditTitleMode(false)
+    },
+    [setTitle],
+  )
 
   const handleCopy = useCallback(
     (id: string) => {

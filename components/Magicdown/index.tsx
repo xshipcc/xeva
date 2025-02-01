@@ -18,7 +18,7 @@ import 'katex/dist/katex.min.css'
 const Mermaid = dynamic(() => import('./Mermaid'))
 
 function getLangAlias(lang: string): string {
-  return get(langAlias, lang, capitalize(lang))
+  return get(langAlias, lang, capitalize(lang)) || ''
 }
 
 function Magicdown({ children: content, className, ...rest }: Options) {
@@ -62,7 +62,7 @@ function Magicdown({ children: content, className, ...rest }: Options) {
             return (
               <>
                 <div className="flex h-10 w-full items-center justify-between overflow-x-auto break-words rounded-t bg-gray-200 pl-4 pr-3 text-sm text-slate-500 dark:bg-[rgb(31,41,55)]">
-                  {lang ? <span title={lang[1]}>{getLangAlias(lang[1])}</span> : null}
+                  {lang ? <span title={lang[1]}>{getLangAlias(lang[1])}</span> : <span></span>}
                   <Button
                     className="h-6 w-6 rounded-sm p-1 dark:hover:bg-slate-900/80"
                     variant="ghost"

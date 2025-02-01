@@ -651,15 +651,15 @@ export default function Home() {
     clearMessage()
     setErrorMessage('')
     toast({
-      title: 'Chat content cleared',
+      title: t('chatContentCleared'),
       action: (
         <ToastAction altText="Undo" onClick={() => restore(conversation)}>
-          Undo
+          {t('undo')}
         </ToastAction>
       ),
       duration: 3600,
     })
-  }, [toast])
+  }, [toast, t])
 
   const updateTalkMode = useCallback((type: 'chat' | 'voice') => {
     const { update } = useSettingStore.getState()

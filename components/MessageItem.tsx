@@ -310,7 +310,7 @@ function MessageItem(props: Props) {
               <Magicdown>{html}</Magicdown>
               <div
                 className={cn(
-                  'flex gap-1 text-right opacity-0 transition-opacity duration-300 group-hover:opacity-100',
+                  'flex gap-1 text-right opacity-0 transition-opacity duration-300 group-hover:opacity-100 max-md:opacity-30',
                   role === 'user' && chatLayout === 'chat' ? 'justify-start' : 'justify-end',
                 )}
               >
