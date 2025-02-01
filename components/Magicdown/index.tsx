@@ -1,41 +1,31 @@
 import dynamic from 'next/dynamic'
-import { useMemo, useState, memo } from 'react'
+import { useMemo, memo } from 'react'
 import Markdown, { type Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
-import copy from 'copy-to-clipboard'
-import { Copy, CopyCheck } from 'lucide-react'
-import Button from '@/components/Button'
-import { langAlias } from '@/constant/highlight'
 import { clsx } from 'clsx'
-import { omit, capitalize, get, isNumber } from 'lodash-es'
+import { omit } from 'lodash-es'
 
 import './style.css'
 import 'katex/dist/katex.min.css'
 
+const Code = dynamic(() => import('./Code'))
 const Mermaid = dynamic(() => import('./Mermaid'))
 
-function getLangAlias(lang: string): string {
-  return get(langAlias, lang, capitalize(lang)) || ''
+function getContent(content: string | null | undefined, start?: number, end?: number): string {
+  if (content && start && end) {
+    return content.substring(start, end)
+  } else {
+    return ''
+  }
 }
 
 function Magicdown({ children: content, className, ...rest }: Options) {
-  const [waitingCopy, setWaitingCopy] = useState<boolean>(false)
   const remarkPlugins = useMemo(() => rest.remarkPlugins ?? [], [rest.remarkPlugins])
   const rehypePlugins = useMemo(() => rest.rehypePlugins ?? [], [rest.rehypePlugins])
   const components = useMemo(() => rest.components ?? {}, [rest.components])
-
-  const handleCopy = (start: number | undefined, end: number | undefined) => {
-    if (content && isNumber(start) && isNumber(end)) {
-      setWaitingCopy(true)
-      copy(content.substring(start, end))
-      setTimeout(() => {
-        setWaitingCopy(false)
-      }, 1200)
-    }
-  }
 
   return (
     <Markdown
@@ -60,26 +50,14 @@ function Magicdown({ children: content, className, ...rest }: Options) {
               return <Mermaid>{children}</Mermaid>
             }
             return (
-              <>
-                <div className="flex h-10 w-full items-center justify-between overflow-x-auto break-words rounded-t bg-gray-200 pl-4 pr-3 text-sm text-slate-500 dark:bg-[rgb(31,41,55)]">
-                  {lang ? <span title={lang[1]}>{getLangAlias(lang[1])}</span> : <span></span>}
-                  <Button
-                    className="h-6 w-6 rounded-sm p-1 dark:hover:bg-slate-900/80"
-                    variant="ghost"
-                    title="Copy"
-                    onClick={() => handleCopy(node?.position?.start.offset, node?.position?.end.offset)}
-                  >
-                    {waitingCopy ? (
-                      <CopyCheck className="h-full w-full text-green-500" />
-                    ) : (
-                      <Copy className="h-full w-full" />
-                    )}
-                  </Button>
-                </div>
-                <code {...rest} className={clsx('break-words rounded-b', className)}>
+              <Code
+                content={getContent(content, node?.position?.start.offset, node?.position?.end.offset)}
+                lang={lang ? lang[1] : ''}
+              >
+                <code {...rest} className={clsx('break-words', className)}>
                   {children}
                 </code>
-              </>
+              </Code>
             )
           } else {
             return (
