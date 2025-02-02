@@ -54,14 +54,14 @@ function Magicdown({ children: content, className, ...rest }: Options) {
                 content={getContent(content, node?.position?.start.offset, node?.position?.end.offset)}
                 lang={lang ? lang[1] : ''}
               >
-                <code {...rest} className={clsx('break-words', className)}>
+                <code {...rest} className={clsx('break-all', className)}>
                   {children}
                 </code>
               </Code>
             )
           } else {
             return (
-              <code {...rest} className={clsx('break-words', className)}>
+              <code {...rest} className={clsx('break-all', className)}>
                 {children}
               </code>
             )

@@ -47,7 +47,7 @@ function Code({ children, content, lang }: Props) {
 
   return (
     <>
-      <div className="flex h-10 w-full items-center justify-between overflow-x-auto break-words rounded-t bg-gray-200 pl-4 pr-3 text-sm text-slate-500 dark:bg-[rgb(31,41,55)]">
+      <div className="flex h-10 w-full items-center justify-between overflow-x-auto break-all rounded-t bg-gray-200 pl-4 pr-3 text-sm text-slate-500 dark:bg-[rgb(31,41,55)]">
         {lang ? <span title={lang}>{getLangAlias(lang)}</span> : <span></span>}
         <div className="flex gap-1">
           <Button

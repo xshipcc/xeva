@@ -74,6 +74,10 @@
   @apply list-disc pl-8 text-base;
 }
 
+.markdown li {
+  @apply list-outside;
+}
+
 .markdown.small ul {
   @apply text-sm;
 }
