@@ -58,7 +58,6 @@ let cachedModelList = false
 function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
   const { t } = useTranslation()
   const pwaInstall = usePWAInstall()
-  const { apiKey, apiProxy, password, update, reset } = useSettingStore()
   const modelStore = useModelStore()
   const { isProtected, buildMode, modelList: MODEL_LIST } = useEnvStore()
   const [ttsLang, setTtsLang] = useState<string>('')
@@ -67,7 +66,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
     return new EdgeSpeech({ locale: ttsLang }).voiceOptions || []
   }, [ttsLang])
   const modelOptions = useMemo(() => {
-    const { update } = useSettingStore.getState()
+    const { model, update } = useSettingStore.getState()
 
     if (modelStore.models.length > 0) {
       const models = values(Model)
@@ -96,15 +95,17 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
       } else if (modelName.startsWith('@')) {
         const name = modelName.substring(1)
         if (!modelList.includes(name)) modelList.push(name)
-        update({ model: name })
-        defaultModel = name
+        if (model === '') {
+          update({ model: name })
+          defaultModel = name
+        }
       } else {
         modelList.push(modelName.startsWith('+') ? modelName.substring(1) : modelName)
       }
     })
 
     const models = modelList.length > 0 ? modelList : defaultModelList
-    if (!models.includes(defaultModel)) {
+    if (models.length > 0 && !models.includes(defaultModel)) {
       update({ model: models[0] })
     }
 
@@ -164,16 +165,18 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
   )
 
   const handleReset = useCallback(() => {
+    const { reset } = useSettingStore.getState()
     const defaultValues = reset()
     form.reset(defaultValues)
-  }, [reset, form])
+  }, [form])
 
   const handleSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
+      const { update } = useSettingStore.getState()
       update(values as Partial<Setting>)
       onClose()
     },
-    [onClose, update],
+    [onClose],
   )
 
   const handlePwaInstall = useCallback(async () => {
@@ -184,18 +187,19 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
   }, [pwaInstall])
 
   const uploadModelList = useCallback(() => {
-    const { update } = useModelStore.getState()
+    const { update: updateModelList } = useModelStore.getState()
+    const { apiKey, apiProxy, password } = useSettingStore.getState()
     if (apiKey || password || !isProtected) {
       fetchModels({ apiKey, apiProxy, password })
         .then((models) => {
           if (models.length > 0) {
-            update(models)
+            updateModelList(models)
             cachedModelList = true
           }
         })
         .catch(console.error)
     }
-  }, [apiKey, apiProxy, password, isProtected])
+  }, [isProtected])
 
   useEffect(() => {
     if (open && !cachedModelList) {

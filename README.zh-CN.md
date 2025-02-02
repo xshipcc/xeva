@@ -296,9 +296,23 @@ vercel 部署后生成的域名在几年前就已经被国内网络屏蔽，但�
 - [ChatGPT-Next-Web](https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web)
 - [Open Canvas](https://github.com/langchain-ai/open-canvas)
 
+## 贡献
+
+欢迎为该项目做出贡献！如果您愿意做出贡献，请按照以下步骤操作：
+
+1. 在 GitHub 上 Fork 存储库。
+2. 将您 Fork 的项目克隆到本地工作区。
+3. 为您的更改创建一个新分支。
+4. 进行更改并将其提交到您的分支。
+5. 将您的更改推送到 GitHub 上的分叉。
+6. 从您的分支向主存储库提交拉取请求。
+
+在提交拉取请求之前，请确保您的代码遵循项目的编码风格并且所有测试都通过。
+如果您发现任何错误或有改进建议，请随时在 GitHub 上创建新的 issue。
+
 ## 开源协议
 
-[MIT](https://www.apache.org/licenses/LICENSE-2.0)
+本项目遵循 [MIT](https://www.apache.org/licenses/LICENSE-2.0) 许可证。请参阅 LICENSE 文件以获取完整的许可证文本。
 
 ## 收藏历史
 

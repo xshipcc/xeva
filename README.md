@@ -292,9 +292,22 @@ If you deploy the project in a subdirectory and encounter resource loading failu
 
 Currently, the two kind models `Gemini 1.5` and `Gemini 2.0` support most images, audios, videos and some text files. For details. For other document types, we will try to use [LangChain.js](https://js.langchain.com/v0.2/docs/introduction/) later.
 
+## Contributing
+
+Contributions to this project are welcome! If you would like to contribute, please follow these steps:
+
+1. Fork the repository on GitHub.
+2. Clone your fork to your local machine.
+3. Create a new branch for your changes.
+4. Make your changes and commit them to your branch.
+5. Push your changes to your fork on GitHub.
+6. Open a pull request from your branch to the main repository.
+
+Please ensure that your code follows the project's coding style and that all tests pass before submitting a pull request. If you find any bugs or have suggestions for improvements, feel free to open an issue on GitHub.
+
 ## LICENSE
 
-[MIT](https://www.apache.org/licenses/LICENSE-2.0)
+This project is licensed under the [MIT](https://www.apache.org/licenses/LICENSE-2.0) License. See the LICENSE file for the full license text.
 
 ## Star History
 
