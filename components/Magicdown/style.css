@@ -6,6 +6,10 @@
   @apply w-full leading-normal text-gray-900 dark:text-gray-100;
 }
 
+.markdown.small {
+  @apply text-sm;
+}
+
 .markdown li + li {
   @apply mt-1;
 }
@@ -27,19 +31,19 @@
 }
 
 .markdown h1 {
-  @apply my-4 border-b pb-2 text-4xl font-semibold leading-tight;
-}
-
-.markdown h2 {
   @apply my-4 border-b pb-2 text-2xl font-semibold leading-tight;
 }
 
+.markdown h2 {
+  @apply my-4 border-b pb-2 text-xl font-semibold leading-tight;
+}
+
 .markdown h3 {
-  @apply my-3 text-lg font-semibold leading-snug;
+  @apply my-3 text-base font-semibold leading-snug;
 }
 
 .markdown h4 {
-  @apply my-3 text-base font-semibold leading-none;
+  @apply my-3 text-sm font-semibold leading-none;
 }
 
 .markdown h5 {
@@ -70,8 +74,16 @@
   @apply list-disc pl-8 text-base;
 }
 
+.markdown.small ul {
+  @apply text-sm;
+}
+
 .markdown ol {
   @apply list-decimal pl-8 text-base;
+}
+
+.markdown.small ol {
+  @apply text-sm;
 }
 
 .markdown kbd {
@@ -80,6 +92,10 @@
 
 .markdown table {
   @apply block w-max max-w-full border-collapse border-spacing-0 overflow-auto border-gray-600 text-base dark:border-gray-300;
+}
+
+.markdown.small table {
+  @apply text-sm;
 }
 
 .markdown table img {
