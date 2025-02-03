@@ -208,10 +208,10 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
   }, [open, uploadModelList])
 
   useLayoutEffect(() => {
-    if (buildMode === 'export') {
+    if (buildMode === 'export' || !isProtected) {
       setHiddenPasswordInput(true)
     }
-  }, [buildMode])
+  }, [buildMode, isProtected])
 
   return (
     <ResponsiveDialog
