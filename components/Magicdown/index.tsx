@@ -68,7 +68,7 @@ function Magicdown({ children: content, className, ...rest }: Options) {
           }
         },
         a: (props) => {
-          const { children, href = '', target, ...rest } = props
+          const { children, className, href = '', target, ...rest } = props
           if (/\.(aac|mp3|opus|wav)$/.test(href)) {
             return (
               <figure>
@@ -85,7 +85,12 @@ function Magicdown({ children: content, className, ...rest }: Options) {
           }
           const isInternal = /^\/#/i.test(href)
           return (
-            <a {...omit(rest, ['node'])} href={href} target={isInternal ? '_self' : target ?? '_blank'}>
+            <a
+              {...omit(rest, ['node'])}
+              className={clsx('break-all', className)}
+              href={href}
+              target={isInternal ? '_self' : target ?? '_blank'}
+            >
               {children}
             </a>
           )
