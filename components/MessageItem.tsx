@@ -1,6 +1,6 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { useEffect, useState, useCallback, useMemo, memo } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Lightbox from 'yet-another-react-lightbox'
 import LightboxFullscreen from 'yet-another-react-lightbox/plugins/fullscreen'
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { EdgeSpeech } from '@xiangfa/polly'
 import copy from 'copy-to-clipboard'
+import { convert } from 'html-to-text'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import BubblesLoading from '@/components/BubblesLoading'
@@ -71,10 +72,10 @@ function mergeSentences(sentences: string[], sentenceLength = 20): string[] {
 function MessageItem(props: Props) {
   const { id, role, parts, attachments, onRegenerate } = props
   const { t } = useTranslation()
+  const contentRef = useRef<HTMLDivElement>(null)
   const [html, setHtml] = useState<string>('')
   const [thoughtsHtml, setThoughtsHtml] = useState<string>('')
   const chatLayout = useMessageStore((state) => state.chatLayout)
-  const [hasTextContent, setHasTextContent] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [isCopyed, setIsCopyed] = useState<boolean>(false)
   const [showLightbox, setShowLightbox] = useState<boolean>(false)
@@ -155,8 +156,14 @@ function MessageItem(props: Props) {
     }, 1200)
   }, [content])
 
-  const handleSpeak = useCallback(async (content: string) => {
+  const handleSpeak = useCallback(async () => {
+    if (!contentRef.current) return false
+
     const { lang, ttsLang, ttsVoice } = useSettingStore.getState()
+    const content = convert(contentRef.current.innerHTML, {
+      wordwrap: false,
+      selectors: [{ selector: 'ul', options: { itemPrefix: '  ' } }],
+    })
     const sentences = mergeSentences(sentenceSegmentation(content, lang), 100)
     const edgeSpeech = new EdgeSpeech({ locale: ttsLang })
     const audioStream = new AudioStream()
@@ -307,7 +314,9 @@ function MessageItem(props: Props) {
                   </AccordionItem>
                 </Accordion>
               ) : null}
-              <Magicdown>{html}</Magicdown>
+              <div ref={contentRef}>
+                <Magicdown>{html}</Magicdown>
+              </div>
               <div
                 className={cn(
                   'flex gap-1 text-right opacity-0 transition-opacity duration-300 group-hover:opacity-100 max-md:opacity-30',
@@ -325,13 +334,13 @@ function MessageItem(props: Props) {
                     <IconButton title={t('edit')} onClick={() => setIsEditing(true)}>
                       <PencilLine className="h-4 w-4" />
                     </IconButton>
-                    <IconButton title={t('copy')} className={`copy-${id}`} onClick={() => handleCopy()}>
+                    <IconButton title={t('copy')} onClick={() => handleCopy()}>
                       {isCopyed ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </IconButton>
                     <IconButton title={t('delete')} onClick={() => handleDelete(id)}>
                       <Eraser className="h-4 w-4" />
                     </IconButton>
-                    <IconButton title={t('speak')} onClick={() => handleSpeak(content)}>
+                    <IconButton title={t('speak')} onClick={() => handleSpeak()}>
                       <Volume2 className="h-4 w-4" />
                     </IconButton>
                   </>
@@ -358,7 +367,6 @@ function MessageItem(props: Props) {
         setThoughtsHtml(textParts[0].text)
       }
       if (textParts[1].text) {
-        setHasTextContent(true)
         setHtml(textParts[1].text)
       }
     } else {
@@ -366,7 +374,6 @@ function MessageItem(props: Props) {
       parts.forEach(async (part) => {
         if (part.text) {
           messageParts.push(part.text)
-          setHasTextContent(true)
         }
       })
       setHtml(messageParts.join(''))

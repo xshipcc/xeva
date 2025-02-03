@@ -14,14 +14,6 @@ import 'katex/dist/katex.min.css'
 const Code = dynamic(() => import('./Code'))
 const Mermaid = dynamic(() => import('./Mermaid'))
 
-function getContent(content: string | null | undefined, start?: number, end?: number): string {
-  if (content && start && end) {
-    return content.substring(start, end)
-  } else {
-    return ''
-  }
-}
-
 function Magicdown({ children: content, className, ...rest }: Options) {
   const remarkPlugins = useMemo(() => rest.remarkPlugins ?? [], [rest.remarkPlugins])
   const rehypePlugins = useMemo(() => rest.rehypePlugins ?? [], [rest.rehypePlugins])
@@ -50,10 +42,7 @@ function Magicdown({ children: content, className, ...rest }: Options) {
               return <Mermaid>{children}</Mermaid>
             }
             return (
-              <Code
-                content={getContent(content, node?.position?.start.offset, node?.position?.end.offset)}
-                lang={lang ? lang[1] : ''}
-              >
+              <Code lang={lang ? lang[1] : ''}>
                 <code {...rest} className={clsx('break-all', className)}>
                   {children}
                 </code>

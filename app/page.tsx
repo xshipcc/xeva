@@ -190,6 +190,9 @@ export default function Home() {
         safety,
       }
       if (systemInstruction) config.systemInstruction = systemInstruction
+      if (talkMode === 'voice') {
+        config.systemInstruction = `${getVoiceModelPrompt()}\n\n${systemInstruction}`
+      }
       if (tools.length > 0 && !isThinkingModel) config.tools = [{ functionDeclarations: tools }]
       if (apiKey !== '') {
         config.baseUrl = apiProxy || GEMINI_API_BASE_URL
@@ -277,7 +280,7 @@ export default function Home() {
         }
       }
     },
-    [systemInstruction, isThinkingModel],
+    [systemInstruction, isThinkingModel, talkMode],
   )
 
   const summarize = useCallback(
@@ -326,9 +329,7 @@ export default function Home() {
         },
         onStatement: (statement) => {
           if (talkMode === 'voice') {
-            // Remove list symbols and adjust layout
-            const audioText = statement.replaceAll('*', '').replaceAll('\n\n', '\n')
-            speech(audioText)
+            speech(statement)
           }
         },
         onFinish: async () => {
@@ -596,7 +597,6 @@ export default function Home() {
         messages = getTalkAudioPrompt(messages)
       }
       if (talkMode === 'voice') {
-        messages = getVoiceModelPrompt(messages)
         setStatus('thinkng')
         setSubtitle('')
       }

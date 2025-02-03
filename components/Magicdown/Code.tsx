@@ -12,7 +12,6 @@ import './highlight.css'
 
 type Props = {
   children: ReactNode
-  content: string | null | undefined
   lang: string
 }
 
@@ -20,7 +19,7 @@ function getLangAlias(lang: string): string {
   return get(langAlias, lang, capitalize(lang)) || ''
 }
 
-function Code({ children, content, lang }: Props) {
+function Code({ children, lang }: Props) {
   const { t } = useTranslation()
   const codeWrapperRef = useRef<HTMLDivElement>(null)
   const [waitingCopy, setWaitingCopy] = useState<boolean>(false)
@@ -29,9 +28,9 @@ function Code({ children, content, lang }: Props) {
   const isMobile = useIsMobile(450)
 
   const handleCopy = () => {
-    if (content) {
+    if (codeWrapperRef.current) {
       setWaitingCopy(true)
-      copy(content)
+      copy(codeWrapperRef.current.innerText)
       setTimeout(() => {
         setWaitingCopy(false)
       }, 1200)
