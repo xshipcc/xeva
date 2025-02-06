@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
+import { useToast } from '@/components/ui/use-toast'
 import Button from '@/components/Button'
 import ResponsiveDialog from '@/components/ResponsiveDialog'
 import i18n from '@/utils/i18n'
@@ -55,8 +56,13 @@ const formSchema = z.object({
 
 let cachedModelList = false
 
+function filterModel(models: Model[] = []) {
+  return models.filter((model) => model.name.startsWith('models/gemini-'))
+}
+
 function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const pwaInstall = usePWAInstall()
   const modelStore = useModelStore()
   const { isProtected, buildMode, modelList: MODEL_LIST } = useEnvStore()
@@ -190,16 +196,21 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
     const { update: updateModelList } = useModelStore.getState()
     const { apiKey, apiProxy, password } = useSettingStore.getState()
     if (apiKey || password || !isProtected) {
-      fetchModels({ apiKey, apiProxy, password })
-        .then((models) => {
-          if (models.length > 0) {
-            updateModelList(models)
-            cachedModelList = true
-          }
-        })
-        .catch(console.error)
+      fetchModels({ apiKey, apiProxy, password }).then((result) => {
+        if (result.error) {
+          return toast({
+            description: result.error.message,
+            duration: 3000,
+          })
+        }
+        const models = filterModel(result.models)
+        if (models.length > 0) {
+          updateModelList(models)
+          cachedModelList = true
+        }
+      })
     }
-  }, [isProtected])
+  }, [isProtected, toast])
 
   useEffect(() => {
     if (open && !cachedModelList) {

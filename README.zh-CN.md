@@ -145,7 +145,7 @@
 
 #### `GEMINI_API_KEY`（可选）
 
-您的 Gemini api 密钥。 如果您需要“启用”服务器 api，这是必需的。
+您的 Gemini api 密钥。 如果您需要“启用”服务器 api，这是必需的。**该变量不会影响前端页面上的 Gemini 密钥的值。**
 支持多个 key，每个 key 之间使用 `,` 分隔，即 `key1,key2,key3`
 
 #### `GEMINI_API_BASE_URL`（可选）
@@ -154,7 +154,7 @@
 
 > 示例：`http://your-gemini-proxy.com`
 
-覆盖 Gemini api 请求基本 url。**为了避免服务端代理 url 泄漏，不会覆盖前端页面中的链接。**
+覆盖 Gemini api 请求基本 url。**为了避免服务端代理 url 泄漏，不会覆盖和影响前端页面中的值。**
 
 #### `NEXT_PUBLIC_GEMINI_MODEL_LIST`（可选）
 

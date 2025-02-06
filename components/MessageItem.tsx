@@ -322,7 +322,9 @@ function MessageItem(props: Props) {
                   className="mx-0.5 my-2"
                   dangerouslySetInnerHTML={{
                     __html:
-                      groundingMetadata.searchEntryPoint?.renderedContent?.replaceAll('<a', '<a target="_blank"') || '',
+                      groundingMetadata.searchEntryPoint?.renderedContent
+                        ?.replace('margin: 0 8px', 'margin: 0 4px')
+                        .replaceAll('<a', '<a target="_blank"') || '',
                   }}
                 ></div>
               ) : null}
@@ -389,13 +391,12 @@ function MessageItem(props: Props) {
       if (groundingMetadata) {
         const { groundingSupports = [], groundingChunks = [] } = groundingMetadata
         groundingSupports.forEach((item) => {
-          console.log(content.includes(item.segment.text))
           content = content.replace(
             item.segment.text,
-            `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][groundingSearch-${indice}]]`).join('')}`,
+            `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][gs-${indice}]]`).join('')}`,
           )
         })
-        content += `\n\n${groundingChunks.map((item, idx) => `[groundingSearch-${idx}]: <${item.web?.uri}> "${item.web?.title}"`).join('\n')}`
+        content += `\n\n${groundingChunks.map((item, idx) => `[gs-${idx}]: <${item.web?.uri}> "${item.web?.title}"`).join('\n')}`
       }
       setHtml(content)
     }

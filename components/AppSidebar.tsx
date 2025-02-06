@@ -209,7 +209,18 @@ function ConversationItem(props: Props) {
             mdContentList.push(part.functionResponse.name)
             mdContentList.push(wrapJsonCode(JSON.stringify(part.functionResponse.response, null, 2)))
           } else if (part.text) {
-            mdContentList.push(part.text)
+            let content = part.text
+            if (item.groundingMetadata) {
+              const { groundingSupports = [], groundingChunks = [] } = item.groundingMetadata
+              groundingSupports.forEach((item) => {
+                content = content.replace(
+                  item.segment.text,
+                  `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][gs-${indice}]]`).join('')}`,
+                )
+              })
+              content += `\n\n${groundingChunks.map((item, idx) => `[gs-${idx}]: <${item.web?.uri}> "${item.web?.title}"`).join('\n')}`
+            }
+            mdContentList.push(content)
           }
         })
       })

@@ -176,7 +176,7 @@ Rules and guidelines:
 <rules-guidelines>
 - ONLY change the language and nothing else.
 - Respond with ONLY the updated artifact, and no additional text before or after.
-- Do not wrap it in any XML tags you see in this prompt. Ensure it's just the updated artifact.
+- Do not wrap it in \`<feature></feature>\`, \`<artifact></artifact>\`, \`<systemInstruction></systemInstruction>\`, \`<rules-guidelines></rules-guidelines>\`. Ensure it's just the updated artifact.
 - Do not change the language of the updated artifact. The updated artifact language is consistent with the current artifact.
 </rules-guidelines>
 `
@@ -201,8 +201,7 @@ Rules and guidelines:
 <rules-guidelines>
 - ONLY change the language and nothing else.
 - Respond with ONLY the updated artifact, and no additional text before or after.
-- Do not wrap it in any XML tags you see in this prompt. Ensure it's just the updated artifact.
-- Do not change the language of the updated artifact. The updated artifact language is consistent with the current artifact.
+- Do not wrap it in \`<artifact></artifact>\`, \`<systemInstruction></systemInstruction>\`, \`<rules-guidelines></rules-guidelines>\`. Ensure it's just the updated artifact.
 </rules-guidelines>
 `
 }
@@ -237,7 +236,7 @@ ${systemInstruction}
 Rules and guidelines:
 <rules-guidelines>
 - Respond with ONLY the updated artifact, and no additional text before or after.
-- Do not wrap it in any XML tags you see in this prompt. Ensure it's just the updated artifact.
+- Do not wrap it in \`<artifact></artifact>\`, \`<systemInstruction></systemInstruction>\`, \`<rules-guidelines></rules-guidelines>\`. Ensure it's just the updated artifact.
 - Do not change the language of the updated artifact. The updated artifact language is consistent with the current artifact.
 </rules-guidelines>
 `
@@ -261,7 +260,7 @@ ${systemInstruction}
 Rules and guidelines:
 </rules-guidelines>
 - Respond with ONLY the updated artifact, and no additional text before or after.
-- Do not wrap it in any XML tags you see in this prompt. Ensure it's just the updated artifact.
+- Do not wrap it in \`<artifact></artifact>\`, \`<systemInstruction></systemInstruction>\`, \`<rules-guidelines></rules-guidelines>\`. Ensure it's just the updated artifact.
 - Do not change the language of the updated artifact. The updated artifact language is consistent with the current artifact.
 </rules-guidelines>
 `
@@ -286,7 +285,7 @@ Rules and guidelines:
 </rules-guidelines>
 - Respond with ONLY the updated artifact, and no additional text before or after.
 - Ensure you respond with the entire updated artifact, including the emojis.
-- Do not wrap it in any XML tags you see in this prompt. Ensure it's just the updated artifact.
+- Do not wrap it in \`<artifact></artifact>\`, \`<systemInstruction></systemInstruction>\`, \`<rules-guidelines></rules-guidelines>\`. Ensure it's just the updated artifact.
 - Do not change the language of the updated artifact. The updated artifact language is consistent with the current artifact.
 </rules-guidelines>
 `
@@ -311,7 +310,7 @@ ${systemInstruction}
 Rules and guidelines:
 </rules-guidelines>
 - Respond with ONLY the continued artifact, and no additional text before.
-- Do not wrap it in any XML tags you see in this prompt. Ensure it's just the continued artifact.
+- Do not wrap it in \`<artifact></artifact>\`, \`<systemInstruction></systemInstruction>\`, \`<rules-guidelines></rules-guidelines>\`. Ensure it's just the updated artifact.
 - Do not change the language of the continued artifact. The continued artifact language is consistent with the current artifact.
 </rules-guidelines>
 `
