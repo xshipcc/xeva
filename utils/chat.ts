@@ -56,6 +56,13 @@ export function getSafetySettings(level: string) {
   })
 }
 
+function canUseSearchAsTool(model: string) {
+  if (model.startsWith('gemini-2.0-flash') || model.startsWith('gemini-2.0-pro')) {
+    if (model.includes('lite') || model.includes('thinking')) return false
+    return true
+  }
+}
+
 export default async function chat({
   messages = [],
   systemInstruction,
@@ -96,13 +103,11 @@ export default async function chat({
     }
     if (toolConfig) modelParams.toolConfig = toolConfig
   }
-  if (model === 'gemini-2.0-flash-exp') {
+  if (canUseSearchAsTool(model)) {
     const officialPlugins = [{ googleSearch: {} }]
     if (!tools) {
       modelParams.tools = officialPlugins
     }
-  }
-  if (model.startsWith('gemini-2.0-flash-exp')) {
     if (modelParams.safetySettings) {
       const safetySettings: NewModelParams['safetySettings'] = []
       modelParams.safetySettings.forEach((item) => {
