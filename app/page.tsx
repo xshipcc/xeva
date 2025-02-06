@@ -53,7 +53,11 @@ import { type OpenAPIV3_1 } from 'openapi-types'
 interface AnswerParams {
   messages: Message[]
   model: string
-  onResponse: (readableStream: ReadableStream, thoughtReadableStream: ReadableStream) => void
+  onResponse: (
+    readableStream: ReadableStream,
+    thoughtReadableStream: ReadableStream,
+    groundingSearchReadable: ReadableStream,
+  ) => void
   onFunctionCall?: (functionCalls: FunctionCall[]) => void
   onError?: (error: string, code?: number) => void
 }
@@ -216,9 +220,15 @@ export default function Home() {
             controller.enqueue(encoder.encode(chunk))
           },
         })
+        const { readable: groundingSearchReadable, writable: groundingSearchWritable } = new TransformStream({
+          transform(chunk, controller) {
+            controller.enqueue(encoder.encode(chunk))
+          },
+        })
         const writer = writable.getWriter()
         const thoughtWriter = thoughtWritable.getWriter()
-        onResponse(readable, thoughtReadable)
+        const groundingSearchWriter = groundingSearchWritable.getWriter()
+        onResponse(readable, thoughtReadable, groundingSearchReadable)
 
         const functionCalls: FunctionCall[][] = []
 
@@ -259,6 +269,9 @@ export default function Home() {
                 }
               } else if (item.finishMessage) {
                 if (isFunction(onError)) onError(item.finishMessage)
+              }
+              if (item.groundingMetadata) {
+                groundingSearchWriter.write(JSON.stringify(item.groundingMetadata))
               }
             })
           }
@@ -312,13 +325,18 @@ export default function Home() {
   }, [])
 
   const handleResponse = useCallback(
-    (readableStream: ReadableStream, thoughtReadableStream: ReadableStream) => {
+    (
+      readableStream: ReadableStream,
+      thoughtReadableStream: ReadableStream,
+      groundingSearchReadableStream: ReadableStream,
+    ) => {
       const { lang, talkMode, maxHistoryLength } = useSettingStore.getState()
       const { summary, add: addMessage } = useMessageStore.getState()
       speechQueue.current = new PromiseQueue()
       setSpeechSilence(false)
       let text = ''
       let thoughtText = ''
+      let groundingSearch: Message['groundingMetadata']
       textStream({
         readable: readableStream,
         locale: lang,
@@ -336,19 +354,18 @@ export default function Home() {
           if (talkMode === 'voice') {
             setStatus('silence')
           }
-          if (text !== '') {
-            addMessage({
-              id: nanoid(),
-              role: 'model',
-              parts: thoughtText !== '' ? [{ text: thoughtText }, { text }] : [{ text }],
-            })
-          } else if (thoughtText !== '') {
-            addMessage({
-              id: nanoid(),
-              role: 'model',
-              parts: [{ text: thoughtText }],
-            })
+          const message: Message = {
+            id: nanoid(),
+            role: 'model',
+            parts: [],
           }
+          if (text !== '') {
+            message.parts = thoughtText !== '' ? [{ text: thoughtText }, { text }] : [{ text }]
+          } else if (thoughtText !== '') {
+            message.parts = [{ text: thoughtText }]
+          }
+          if (groundingSearch) message.groundingMetadata = groundingSearch
+          addMessage(message)
           setMessage('')
           setThinkingMessage('')
           // scrollToBottom()
@@ -374,6 +391,12 @@ export default function Home() {
         onMessage: (content) => {
           thoughtText += content
           setThinkingMessage(thoughtText)
+        },
+      })
+      simpleTextStream({
+        readable: groundingSearchReadableStream,
+        onMessage: (content) => {
+          groundingSearch = JSON.parse(content)
         },
       })
     },
@@ -518,6 +541,16 @@ export default function Home() {
     },
     [fetchAnswer, handleResponse, handleError, executingPlugins],
   )
+
+  // const handleGroundingSearch = useCallback((groundingMetadata: GroundingMetadata) => {
+  //   const { messages, update: updateMessage } = useMessageStore.getState()
+  //   const currentModelMessageIndex = findLastIndex(messages, { role: 'model' })
+  //   console.log(currentModelMessageIndex)
+  //   if (currentModelMessageIndex > -1) {
+  //     const currentModelMessage = messages[currentModelMessageIndex]
+  //     updateMessage(currentModelMessage.id, { ...currentModelMessage, groundingMetadata })
+  //   }
+  // }, [])
 
   const checkAccessStatus = useCallback(() => {
     const { password, apiKey } = useSettingStore.getState()
