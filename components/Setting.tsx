@@ -20,7 +20,7 @@ import ResponsiveDialog from '@/components/ResponsiveDialog'
 import i18n from '@/utils/i18n'
 import { fetchModels } from '@/utils/models'
 import locales from '@/constant/locales'
-import { Model } from '@/constant/model'
+import { Model, DefaultModel } from '@/constant/model'
 import { GEMINI_API_BASE_URL, ASSISTANT_INDEX_URL } from '@/constant/urls'
 import { useSettingStore, useEnvStore } from '@/store/setting'
 import { useModelStore } from '@/store/model'
@@ -79,7 +79,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
     }
 
     let modelList: string[] = []
-    let defaultModel = 'gemini-1.5-flash-latest'
+    let defaultModel = DefaultModel
     const defaultModelList: string[] = keys(Model)
     const userModels: string[] = MODEL_LIST ? MODEL_LIST.split(',') : []
 

@@ -2,7 +2,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import type { InlineDataPart, ModelParams, Tool, ToolConfig, Part, SafetySetting } from '@google/generative-ai'
 import { getVisionPrompt, getFunctionCallPrompt } from '@/utils/prompt'
 import { hasUploadFiles, getRandomKey } from '@/utils/common'
-import { OldVisionModel } from '@/constant/model'
+import { OldVisionModel, DefaultModel } from '@/constant/model'
 import { isUndefined } from 'lodash-es'
 
 export type RequestProps = {
@@ -61,7 +61,7 @@ export default async function chat({
   systemInstruction,
   tools,
   toolConfig,
-  model = 'gemini-1.5-flash-latest',
+  model = DefaultModel,
   apiKey,
   baseUrl,
   generationConfig,

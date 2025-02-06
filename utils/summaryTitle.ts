@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { DefaultModel } from '@/constant/model'
 import { getRandomKey } from '@/utils/common'
 import { getSummaryTitlePrompt } from '@/utils/prompt'
 
@@ -20,7 +21,7 @@ The content in the \`<conversation></conversation>\` tag is the conversation, th
 export default async function summaryTitle(props: RequestProps) {
   const { apiKey, baseUrl, lang, systemRole, messages } = props
   const genAI = new GoogleGenerativeAI(getRandomKey(apiKey))
-  const geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest', systemInstruction }, { baseUrl })
+  const geminiModel = genAI.getGenerativeModel({ model: DefaultModel, systemInstruction }, { baseUrl })
   const { stream } = await geminiModel.generateContentStream([getSummaryTitlePrompt(lang, messages, systemRole)])
   return new ReadableStream({
     async start(controller) {
