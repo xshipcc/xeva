@@ -41,6 +41,7 @@ import { encodeToken } from '@/utils/signature'
 import type { FileManagerOptions } from '@/utils/FileManager'
 import { fileUpload, imageUpload } from '@/utils/upload'
 import { findOperationById } from '@/utils/plugin'
+import { generateImages, type ImageGenerationRequest } from '@/utils/generateImages'
 import { detectLanguage, formatTime, readFileAsDataURL } from '@/utils/common'
 import { cn } from '@/utils'
 import { GEMINI_API_BASE_URL } from '@/constant/urls'
@@ -405,7 +406,7 @@ export default function Home() {
 
   const handleFunctionCall = useCallback(
     async (functionCalls: FunctionCall[]) => {
-      const { model } = useSettingStore.getState()
+      const { apiKey, apiProxy, password, model } = useSettingStore.getState()
       const { add: addMessage } = useMessageStore.getState()
       const { installed } = usePluginStore.getState()
       const pluginExecuteResults: Record<string, unknown> = {}
@@ -472,8 +473,23 @@ export default function Home() {
         // if (!isEmpty(cookie)) payload.cookie = cookie
         try {
           if (baseUrl.startsWith('@plugins/')) {
-            const result = await pluginHandle(pluginId, payload)
-            pluginExecuteResults[call.name] = result
+            if (pluginId === 'OfficialImagen') {
+              if (payload.query) {
+                const options =
+                  apiKey !== ''
+                    ? { apiKey, baseUrl: apiProxy || GEMINI_API_BASE_URL }
+                    : { token: encodeToken(password), baseUrl: '/api/google' }
+                const result = await generateImages({
+                  ...options,
+                  model: 'imagen-3.0-generate-002',
+                  params: payload.query as unknown as ImageGenerationRequest,
+                })
+                pluginExecuteResults[call.name] = result
+              }
+            } else {
+              const result = await pluginHandle(pluginId, payload)
+              pluginExecuteResults[call.name] = result
+            }
           } else {
             let url = payload.baseUrl
             const options: RequestInit = {
