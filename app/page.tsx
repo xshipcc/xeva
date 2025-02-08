@@ -40,6 +40,7 @@ import { textStream, simpleTextStream } from '@/utils/textStream'
 import { encodeToken } from '@/utils/signature'
 import type { FileManagerOptions } from '@/utils/FileManager'
 import { fileUpload, imageUpload } from '@/utils/upload'
+import { parseOffice, isOfficeFile } from '@/utils/officeParser'
 import { findOperationById } from '@/utils/plugin'
 import { generateImages, type ImageGenerationRequest } from '@/utils/generateImages'
 import { detectLanguage, formatTime, readFileAsDataURL } from '@/utils/common'
@@ -774,10 +775,20 @@ export default function Home() {
       const fileList: File[] = []
 
       if (files) {
+        const fileList: File[] = []
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
           if (mimeType.includes(file.type)) {
-            fileList.push(file)
+            if (isOfficeFile(file.type)) {
+              const data = await parseOffice(file, { type: 'file' })
+              if (Array.isArray(data)) {
+                data.forEach((item) => {
+                  fileList.push(item)
+                })
+              }
+            } else {
+              fileList.push(file)
+            }
           }
         }
 

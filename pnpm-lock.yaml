@@ -71,6 +71,9 @@ importers:
       '@xiangfa/polly':
         specifier: ^0.4.3
         version: 0.4.3
+      '@zip.js/zip.js':
+        specifier: ^2.7.57
+        version: 2.7.57
       browser-image-compression:
         specifier: ^2.0.2
         version: 2.0.2
@@ -1365,6 +1368,10 @@ packages:
 
   '@xiangfa/polly@0.4.3':
     resolution: {integrity: sha512-3yTO1y4ULMioxvMmwcNdXSWUCxr2Eqc6t6VwEzy1wdbDJ9mkREWQsp9Pi8RIw5R1vB1Yty4vS8aztdx3Ssg4/g==}
+
+  '@zip.js/zip.js@2.7.57':
+    resolution: {integrity: sha512-BtonQ1/jDnGiMed6OkV6rZYW78gLmLswkHOzyMrMb+CAR7CZO8phOHO6c2qw6qb1g1betN7kwEHhhZk30dv+NA==}
+    engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=16.5.0'}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -4956,6 +4963,8 @@ snapshots:
       query-string: 9.1.1
       radash: 12.1.0
       tslib: 2.6.3
+
+  '@zip.js/zip.js@2.7.57': {}
 
   acorn-jsx@5.3.2(acorn@8.12.0):
     dependencies:

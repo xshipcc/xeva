@@ -5,6 +5,7 @@ import { useToast } from '@/components/ui/use-toast'
 import type { FileManagerOptions } from '@/utils/FileManager'
 import { encodeToken } from '@/utils/signature'
 import { fileUpload, imageUpload } from '@/utils/upload'
+import { parseOffice, isOfficeFile } from '@/utils/officeParser'
 import { useSettingStore, useEnvStore } from '@/store/setting'
 import { useAttachmentStore } from '@/store/attachment'
 import { GEMINI_API_BASE_URL } from '@/constant/urls'
@@ -43,8 +44,27 @@ function FileUploader({ beforeUpload, afterUpload }: Props) {
         apiKey !== '' ? { apiKey, baseUrl: apiProxy || GEMINI_API_BASE_URL } : { token: encodeToken(password) }
       const { add: addAttachment, update: updateAttachment } = useAttachmentStore.getState()
 
+      const fileList: File[] = []
+      if (files) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i]
+          if (mimeType.includes(file.type)) {
+            if (isOfficeFile(file.type)) {
+              const data = await parseOffice(file, { type: 'file' })
+              if (Array.isArray(data)) {
+                data.forEach((item) => {
+                  fileList.push(item)
+                })
+              }
+            } else {
+              fileList.push(file)
+            }
+          }
+        }
+      }
+
       await fileUpload({
-        files,
+        files: fileList,
         uploadLimit,
         fileManagerOptions: options,
         addAttachment,

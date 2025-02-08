@@ -37,6 +37,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@serwist/next": "^9.0.10",
     "@xiangfa/polly": "^0.4.3",
+    "@zip.js/zip.js": "^2.7.57",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "clipboard": "^2.0.11",
