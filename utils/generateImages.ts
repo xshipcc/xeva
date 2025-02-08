@@ -74,7 +74,7 @@ export interface ImageGenerationRequest {
 /**
  * Generated images. It will be returned in response.
  */
-interface GeneratedImage {
+export interface GeneratedImage {
   /**
    * Image bytes.
    */
@@ -84,7 +84,7 @@ interface GeneratedImage {
 /**
  * Response message for generating image.
  */
-interface ImageGenerationResponse {
+export interface ImageGenerationResponse {
   images: GeneratedImage[]
 }
 
