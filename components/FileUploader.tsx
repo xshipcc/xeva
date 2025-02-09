@@ -55,6 +55,8 @@ function FileUploader({ beforeUpload, afterUpload }: Props) {
             } else {
               fileList.push(file)
             }
+          } else if (file.type.startsWith('text/')) {
+            fileList.push(file)
           }
         }
       }

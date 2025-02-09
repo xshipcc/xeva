@@ -780,15 +780,13 @@ export default function Home() {
           const file = files[i]
           if (mimeType.includes(file.type)) {
             if (isOfficeFile(file.type)) {
-              const data = await parseOffice(file, { type: 'file' })
-              if (Array.isArray(data)) {
-                data.forEach((item) => {
-                  fileList.push(item)
-                })
-              }
+              const newFile = await parseOffice(file, { type: 'file' })
+              if (newFile instanceof File) fileList.push(newFile)
             } else {
               fileList.push(file)
             }
+          } else if (file.type.startsWith('text/')) {
+            fileList.push(file)
           }
         }
 

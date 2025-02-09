@@ -125,7 +125,7 @@ A cross-platform application client that supports a permanent menu bar, doubling
 ## Get Started
 
 1. Get [Gemini API Key](https://aistudio.google.com/app/apikey)
-2. One-click deployment of the project, you can choose to deploy to Vercel or Cloudflare
+2. One-click deployment of the project, you can choose to deploy to Vercel
 
    [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fu14app%2Fgemini-next-chat&project-name=gemini-next-chat&env=GEMINI_API_KEY&env=ACCESS_PASSWORD&repository-name=gemini-next-chat)
 
@@ -154,7 +154,7 @@ Supports multiple keys, each key is separated by `,`, i.e. `key1,key2,key3`
 
 > Examples: `http://your-gemini-proxy.com`
 
-Override the Gemini api request base url. **In order to avoid server-side proxy url leakage, the value in the front-end page will not be overwritten and affected. **
+Override the Gemini api request base url. **In order to avoid server-side proxy url leakage, the value in the front-end page will not be overwritten and affected.**
 
 #### `NEXT_PUBLIC_GEMINI_MODEL_LIST` (optional)
 
