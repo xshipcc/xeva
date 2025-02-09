@@ -70,12 +70,51 @@ function parseXMLString(xml: string) {
   return parser.parseFromString(xml, 'text/xml')
 }
 
+function createMergedXmlDocument(): Document {
+  return document.implementation.createDocument(null, 'root') // 将 "root" 替换为您想要的根元素名称
+}
+
+function mergeXmlDocuments(mergedDoc: Document, xmlDocs: Document[]): void {
+  const mergedRoot = mergedDoc.documentElement
+  xmlDocs.forEach((xmlDoc) => {
+    const root = xmlDoc.documentElement
+    if (root) {
+      Array.from(root.childNodes).forEach((node) => {
+        mergedRoot.appendChild(mergedDoc.importNode(node, true))
+      })
+    }
+  })
+}
+
+function serializeXmlDocument(xmlDoc: Document): string {
+  const serializer = new XMLSerializer()
+  return serializer.serializeToString(xmlDoc)
+}
+
+function stringToBlob(xmlString: string): Blob {
+  return new Blob([xmlString], { type: 'text/xml' })
+}
+
+function blobToFile(blob: Blob, fileName: string): File {
+  return new File([blob], fileName, { type: blob.type })
+}
+
+async function mergeXmlBlobs(blobs: Blob[]): Promise<Blob> {
+  const xmlStrings = await Promise.all(blobs.map((blob) => blob.text()))
+  const xmlDocs = xmlStrings.map((xmlString) => parseXMLString(xmlString))
+
+  const mergedDoc = createMergedXmlDocument()
+  mergeXmlDocuments(mergedDoc, xmlDocs)
+
+  const mergedXmlString = serializeXmlDocument(mergedDoc)
+  return stringToBlob(mergedXmlString)
+}
+
 function extractFiles(zipInput: File, filterFn: (filename: string) => boolean): Promise<ExtractedFiles[]> {
   return new Promise(async (resolve, reject) => {
     const extractedFiles: ExtractedFiles[] = []
     const processZipfile = async (entry: Entry) => {
       if (filterFn(entry.filename)) {
-        console.log(entry)
         if (entry.getData) {
           const data = await entry.getData(new BlobWriter())
           extractedFiles.push({
@@ -99,7 +138,7 @@ function extractFiles(zipInput: File, filterFn: (filename: string) => boolean): 
   })
 }
 
-export function parseWord(file: File, config: Partial<OfficeParserConfig>): Promise<string | File[]> {
+export function parseWord(file: File, config: Partial<OfficeParserConfig>): Promise<string | File> {
   /** The target content xml file for the docx file. */
   const mainContentFileRegex = /word\/document[\d+]?.xml/g
   const footnotesFileRegex = /word\/footnotes[\d+]?.xml/g
@@ -128,9 +167,8 @@ export function parseWord(file: File, config: Partial<OfficeParserConfig>): Prom
       // ******************************************************************************************************
       .then(async (files: ExtractedFiles[]) => {
         if (config.type === 'file') {
-          return resolve(
-            files.map((item) => new File([item.data], `${file.name}(${item.filename})`, { type: 'text/xml' })),
-          )
+          const mergedBlob = await mergeXmlBlobs(files.map((item) => item.data))
+          return resolve(blobToFile(mergedBlob, file.name))
         }
 
         /** Store all the text content to respond. */
@@ -140,6 +178,7 @@ export function parseWord(file: File, config: Partial<OfficeParserConfig>): Prom
         for await (const file of files) {
           xmlContentArray.push(await file.data.text())
         }
+
         xmlContentArray.forEach((xmlContent) => {
           /** Find text nodes with w:p tags */
           const xmlParagraphNodesList = parseXMLString(xmlContent).getElementsByTagName('w:p')
@@ -168,7 +207,7 @@ export function parseWord(file: File, config: Partial<OfficeParserConfig>): Prom
   })
 }
 
-export function parsePowerPoint(file: File, config: Partial<OfficeParserConfig>): Promise<string | File[]> {
+export function parsePowerPoint(file: File, config: Partial<OfficeParserConfig>): Promise<string | File> {
   // Files regex that hold our content of interest
   const allFilesRegex = /ppt\/(notesSlides|slides)\/(notesSlide|slide)\d+.xml/g
   const slidesRegex = /ppt\/slides\/slide\d+.xml/g
@@ -209,7 +248,8 @@ export function parsePowerPoint(file: File, config: Partial<OfficeParserConfig>)
       // ******************************************************************************************************
       .then(async (files: ExtractedFiles[]) => {
         if (config.type === 'file') {
-          resolve(files.map((item) => new File([item.data], `${file.name}(${item.filename})`, { type: 'text/xml' })))
+          const mergedBlob = await mergeXmlBlobs(files.map((item) => item.data))
+          return resolve(blobToFile(mergedBlob, file.name))
         }
 
         /** Store all the text content to respond */
@@ -246,7 +286,7 @@ export function parsePowerPoint(file: File, config: Partial<OfficeParserConfig>)
   })
 }
 
-export function parseExcel(file: File, config: Partial<OfficeParserConfig>): Promise<string | File[]> {
+export function parseExcel(file: File, config: Partial<OfficeParserConfig>): Promise<string | File> {
   // Files regex that hold our content of interest
   const sheetsRegex = /xl\/worksheets\/sheet\d+.xml/g
   const drawingsRegex = /xl\/drawings\/drawing\d+.xml/g
@@ -291,9 +331,8 @@ export function parseExcel(file: File, config: Partial<OfficeParserConfig>): Pro
               files.push(fileOrFiles)
             }
           }
-          return resolve(
-            files.map((item) => new File([item.data], `${file.name}(${item.filename})`, { type: 'text/xml' })),
-          )
+          const mergedBlob = await mergeXmlBlobs(files.map((item) => item.data))
+          return resolve(blobToFile(mergedBlob, file.name))
         }
 
         /** Store all the text content to respond */
@@ -413,7 +452,7 @@ export function parseExcel(file: File, config: Partial<OfficeParserConfig>): Pro
   })
 }
 
-export function parseOpenOffice(file: File, config: Partial<OfficeParserConfig>): Promise<string | File[]> {
+export function parseOpenOffice(file: File, config: Partial<OfficeParserConfig>): Promise<string | File> {
   /** The target content xml file for the openoffice file. */
   const mainContentFilePath = 'content.xml'
   const objectContentFilesRegex = /Object \d+\/content.xml/g
@@ -446,9 +485,8 @@ export function parseOpenOffice(file: File, config: Partial<OfficeParserConfig>)
               files.push(fileOrFiles)
             }
           }
-          return resolve(
-            files.map((item) => new File([item.data], `${file.name}(${item.filename})`, { type: 'text/xml' })),
-          )
+          const mergedBlob = await mergeXmlBlobs(files.map((item) => item.data))
+          return resolve(blobToFile(mergedBlob, file.name))
         }
 
         /** Store all the notes text content to respond */

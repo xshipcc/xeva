@@ -89,6 +89,7 @@ function ConversationItem(props: Props) {
     const { lang, apiKey, apiProxy, password } = useSettingStore.getState()
     const { currentId, query, addOrUpdate } = useConversationStore.getState()
     const { messages, systemInstruction, setTitle } = useMessageStore.getState()
+
     const conversation = query(id)
     const config: RequestProps = {
       apiKey,
@@ -96,6 +97,9 @@ function ConversationItem(props: Props) {
       messages: id === currentId ? messages : conversation.messages,
       systemRole: id === currentId ? systemInstruction : conversation.systemInstruction,
     }
+
+    if (config.messages.length === 0) return false
+
     if (apiKey !== '') {
       config.baseUrl = apiProxy || GEMINI_API_BASE_URL
     } else {

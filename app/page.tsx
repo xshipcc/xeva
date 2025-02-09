@@ -345,7 +345,6 @@ export default function Home() {
         onMessage: (content) => {
           text += content
           setMessage(text)
-          // scrollToBottom()
         },
         onStatement: (statement) => {
           if (talkMode === 'voice') {
@@ -370,7 +369,6 @@ export default function Home() {
           addMessage(message)
           setMessage('')
           setThinkingMessage('')
-          // scrollToBottom()
           setIsThinking(false)
           stopGeneratingRef.current = false
           setExecutingPlugins([])
@@ -657,6 +655,7 @@ export default function Home() {
       setContent('')
       clearAttachment()
       setTextareaHeight(TEXTAREA_DEFAULT_HEIGHT)
+      scrollToBottom()
       await fetchAnswer({
         messages,
         model,
@@ -665,7 +664,7 @@ export default function Home() {
         onError: handleError,
       })
     },
-    [isOldVisionModel, fetchAnswer, handleResponse, handleFunctionCall, handleError, checkAccessStatus],
+    [isOldVisionModel, fetchAnswer, handleResponse, handleFunctionCall, handleError, checkAccessStatus, scrollToBottom],
   )
 
   const handleResubmit = useCallback(
@@ -684,6 +683,7 @@ export default function Home() {
           }
         }
       }
+      scrollToBottom()
       await fetchAnswer({
         messages: [...messagesRef.current],
         model,
@@ -692,7 +692,7 @@ export default function Home() {
         onError: handleError,
       })
     },
-    [fetchAnswer, handleResponse, handleFunctionCall, handleError, checkAccessStatus],
+    [fetchAnswer, handleResponse, handleFunctionCall, handleError, checkAccessStatus, scrollToBottom],
   )
 
   const handleCleanMessage = useCallback(() => {
@@ -935,7 +935,7 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="mx-auto flex h-screen w-full max-w-screen-md flex-col justify-between overflow-hidden">
+    <main className="mx-auto flex h-screen max-h-[-webkit-fill-available] w-full max-w-screen-md flex-col justify-between overflow-hidden">
       <div className="flex justify-between px-4 pb-2 pr-2 pt-10 max-md:pt-4 max-sm:pr-2 max-sm:pt-4">
         <div className="flex flex-row text-xl leading-8 text-red-400 max-sm:text-base">
           <MessageCircleHeart className="h-10 w-10 max-sm:h-8 max-sm:w-8" />
