@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
   try {
     let url = `${geminiApiBaseUrl || GEMINI_API_BASE_URL}/${version}/models/${model}`
     if (!model.startsWith('imagen')) url += '?alt=sse'
-    console.log(url)
     const response = await fetch(url, {
       method: 'POST',
       headers: {

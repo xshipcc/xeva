@@ -184,7 +184,7 @@ function ConversationItem(props: Props) {
       let mdContentList: string[] = []
 
       const wrapJsonCode = (content: string) => {
-        return `\`\`\`json \n${content} \n\`\`\``
+        return `\`\`\`json\n${content}\n\`\`\``
       }
 
       if (conversation.systemInstruction) {

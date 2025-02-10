@@ -980,7 +980,7 @@ export default function Home() {
               <div
                 className={cn(
                   'group text-slate-500 transition-colors last:text-slate-800 hover:text-slate-800 dark:last:text-slate-400 dark:hover:text-slate-400 max-sm:hover:bg-transparent',
-                  msg.role === 'model' && msg.parts && msg.parts[0].functionCall ? 'hidden' : '',
+                  msg.role === 'model' && msg.parts && msg.parts[0]?.functionCall ? 'hidden' : '',
                 )}
                 key={msg.id}
               >
