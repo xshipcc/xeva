@@ -217,7 +217,7 @@ function MessageItem(props: Props) {
   }
 
   const MessageContent = () => {
-    if (role === 'model' && parts && parts[0].text === '') {
+    if (role === 'model' && parts && parts[0]?.text === '') {
       return <BubblesLoading />
     } else if (role === 'function' && parts && parts[0].functionResponse) {
       const pluginsDetail: {
@@ -396,10 +396,12 @@ function MessageItem(props: Props) {
       if (groundingMetadata) {
         const { groundingSupports = [], groundingChunks = [] } = groundingMetadata
         groundingSupports.forEach((item) => {
-          content = content.replace(
-            item.segment.text,
-            `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][gs-${indice}]]`).join('')}`,
-          )
+          if (item.segment) {
+            content = content.replace(
+              item.segment.text,
+              `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][gs-${indice}]]`).join('')}`,
+            )
+          }
         })
         content += `\n\n${groundingChunks.map((item, idx) => `[gs-${idx}]: <${item.web?.uri}> "${item.web?.title}"`).join('\n')}`
       }
