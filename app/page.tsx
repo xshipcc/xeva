@@ -945,7 +945,7 @@ export default function Home() {
           <div className="ml-1 flex-1 max-sm:ml-0.5">
             <h2 className="text-line-clamp break-all font-bold leading-6 max-sm:text-sm">{conversationTitle}</h2>
             <ModelSelect
-              className="flex h-4 justify-start border-none px-0 py-0 leading-4 text-slate-500 hover:text-slate-700 dark:hover:text-slate-400"
+              className="flex h-4 justify-start border-none px-0 py-0 text-left leading-4 text-slate-500 hover:text-slate-700 dark:hover:text-slate-400"
               defaultModel={model}
             />
           </div>
