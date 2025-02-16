@@ -23,8 +23,6 @@ import { useSidebar } from '@/components/ui/sidebar'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
-import SystemInstruction from '@/components/SystemInstruction'
-import AttachmentArea from '@/components/AttachmentArea'
 import Button from '@/components/Button'
 import { useMessageStore } from '@/store/chat'
 import { useAttachmentStore } from '@/store/attachment'
@@ -40,17 +38,16 @@ import { textStream, simpleTextStream } from '@/utils/textStream'
 import { encodeToken } from '@/utils/signature'
 import type { FileManagerOptions } from '@/utils/FileManager'
 import { fileUpload, imageUpload } from '@/utils/upload'
-import { parseOffice, isOfficeFile } from '@/utils/officeParser'
 import { findOperationById } from '@/utils/plugin'
 import { generateImages, type ImageGenerationRequest } from '@/utils/generateImages'
-import { detectLanguage, formatTime, readFileAsDataURL } from '@/utils/common'
+import { detectLanguage, formatTime, readFileAsDataURL, isOfficeFile } from '@/utils/common'
 import { cn } from '@/utils'
 import { GEMINI_API_BASE_URL } from '@/constant/urls'
 import { OldVisionModel, OldTextModel } from '@/constant/model'
 import mimeType from '@/constant/attachment'
 import { customAlphabet } from 'nanoid'
 import { isFunction, findIndex, isUndefined, entries, flatten, isEmpty } from 'lodash-es'
-import { type OpenAPIV3_1 } from 'openapi-types'
+import type { OpenAPIV3_1 } from 'openapi-types'
 
 interface AnswerParams {
   messages: Message[]
@@ -70,8 +67,10 @@ const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 12)
 const MessageItem = dynamic(() => import('@/components/MessageItem'))
 const ErrorMessageItem = dynamic(() => import('@/components/ErrorMessageItem'))
 const AssistantRecommend = dynamic(() => import('@/components/AssistantRecommend'))
+const SystemInstruction = dynamic(() => import('@/components/SystemInstruction'))
 const Setting = dynamic(() => import('@/components/Setting'))
 const FileUploader = dynamic(() => import('@/components/FileUploader'))
+const AttachmentArea = dynamic(() => import('@/components/AttachmentArea'))
 const PluginList = dynamic(() => import('@/components/PluginList'))
 const ModelSelect = dynamic(() => import('@/components/ModelSelect'))
 
@@ -775,14 +774,13 @@ export default function Home() {
       if (!supportAttachment) return false
       if (!checkAccessStatus()) return false
 
-      const fileList: File[] = []
-
       if (files) {
         const fileList: File[] = []
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
           if (mimeType.includes(file.type)) {
             if (isOfficeFile(file.type)) {
+              const { parseOffice } = await import('@/utils/officeParser')
               const newFile = await parseOffice(file, { type: 'file' })
               if (newFile instanceof File) fileList.push(newFile)
             } else {
