@@ -277,7 +277,7 @@ If you deploy the project in a subdirectory and encounter resource loading failu
 ### Inspiration
 
 - [Lobe Chat](https://github.com/lobehub/lobe-chat)
-- [ChatGPT-Next-Web](https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web)
+- [Next Web](https://github.com/ChatGPTNextWeb/NextChat)
 - [Open Canvas](https://github.com/langchain-ai/open-canvas)
 
 ## FAQ

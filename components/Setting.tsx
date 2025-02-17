@@ -51,6 +51,7 @@ const formSchema = z.object({
   sttLang: z.string().optional(),
   ttsLang: z.string().optional(),
   ttsVoice: z.string().optional(),
+  autoStartRecord: z.boolean().default(false),
   autoStopRecord: z.boolean().default(false),
 })
 
@@ -125,7 +126,9 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
         const state = useSettingStore.getState()
         const store = omitBy(state, (item) => isFunction(item)) as z.infer<typeof formSchema>
         setTtsLang(state.ttsLang)
-        resolve(store)
+        setTimeout(() => {
+          resolve(store)
+        }, 500)
       })
     },
   })
@@ -646,6 +649,21 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                             })}
                           </SelectContent>
                         </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="autoStartRecord"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
+                      <FormLabel className="text-right">{t('autoStartRecord')}</FormLabel>
+                      <FormControl>
+                        <>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          <span className="text-center">{field.value ? t('settingEnable') : t('settingDisable')}</span>
+                        </>
                       </FormControl>
                     </FormItem>
                   )}

@@ -293,7 +293,7 @@ vercel 部署后生成的域名在几年前就已经被国内网络屏蔽，但�
 ### 灵感来源
 
 - [Lobe Chat](https://github.com/lobehub/lobe-chat)
-- [ChatGPT-Next-Web](https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web)
+- [Next Web](https://github.com/ChatGPTNextWeb/NextChat)
 - [Open Canvas](https://github.com/langchain-ai/open-canvas)
 
 ## 贡献
