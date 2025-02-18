@@ -98,7 +98,7 @@
 - 在 1 分钟内使用 Vercel **免费一键部署**
 - 提供体积极小（~4MB）的跨平台客户端（Windows/MacOS/Linux），可以常驻菜单栏，提升办公效率
 - 支持多模态模型，可以理解图片、视频、音频和部分文本文档
-- 语音模式：让您直接与 Gemini 对话
+- 语音模式：让您直接与 Gemini 对话，支持 Multimodal Live API
 - 视觉识别，让 Gemini 可以看懂图片内容
 - 助理市场，拥有数百精选的系统指令
 - 插件系统，内置网络搜索、网页解读、论文搜索、实时天气等多种实用插件
@@ -120,7 +120,9 @@
 - [x] 实现基于 functionCall 插件
 - [x] 支持会话列表
 - [x] 支持对话导出功能
-- [ ] 启用 Multimodal Live API
+- [x] 启用 Multimodal Live API
+- [ ] 支持联网 Deep Research 模式
+- [ ] 支持本地知识库
 
 ## 开始使用
 

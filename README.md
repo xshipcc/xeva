@@ -98,7 +98,7 @@ A cross-platform application client that supports a permanent menu bar, doubling
 - **Deploy for free with one-click** on Vercel in under 1 minute
 - Provides a very small (~4MB) cross-platform client (Windows/MacOS/Linux), can stay in the menu bar to improve office efficiency
 - Supports multi-modal models and can understand images, videos, audios and some text documents
-- Talk mode: Let you talk directly to Gemini
+- Talk mode: Let you talk directly to Gemini, support Multimodal Live API
 - Visual recognition allows Gemini to understand the content of the picture
 - Assistant market with hundreds of selected system instruction
 - Support plugins, with built-in Web search, Web reader, Arxiv search, Weather and other practical plugins
@@ -120,7 +120,9 @@ A cross-platform application client that supports a permanent menu bar, doubling
 - [x] Implementation based on functionCall plug-in
 - [x] Support conversation list
 - [x] Support conversation export features
-- [ ] Enable Multimodal Live API
+- [x] Enable Multimodal Live API
+- [ ] Support networked Deep Research mode
+- [ ] Support local knowledge base
 
 ## Get Started
 

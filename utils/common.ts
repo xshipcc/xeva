@@ -132,6 +132,6 @@ export function isOfficeFile(mimeType: string) {
   return Object.values(officeFileTypes).includes(mimeType)
 }
 
-export function isFullGemini2Model(model: string) {
-  return model.startsWith('gemini-2.0') && !model.includes('lite') && !model.includes('thinking')
+export function isFullGemini2FlashModel(model: string) {
+  return model.startsWith('gemini-2.0-flash') && !model.includes('lite') && !model.includes('thinking')
 }

@@ -37,7 +37,7 @@ import type { FileManagerOptions } from '@/utils/FileManager'
 import { fileUpload, imageUpload } from '@/utils/upload'
 import { findOperationById } from '@/utils/plugin'
 import { generateImages, type ImageGenerationRequest } from '@/utils/generateImages'
-import { detectLanguage, formatTime, readFileAsDataURL, isOfficeFile, isFullGemini2Model } from '@/utils/common'
+import { detectLanguage, formatTime, readFileAsDataURL, isOfficeFile, isFullGemini2FlashModel } from '@/utils/common'
 import { cn } from '@/utils'
 import { GEMINI_API_BASE_URL } from '@/constant/urls'
 import { OldVisionModel, OldTextModel } from '@/constant/model'
@@ -109,7 +109,7 @@ export default function Home() {
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
   const [status, setStatus] = useState<'thinkng' | 'silence' | 'talking'>('silence')
   const canUseMultimodalLive = useMemo(() => {
-    return isFullGemini2Model(model) && !lang.includes('zh')
+    return isFullGemini2FlashModel(model) && !lang.includes('zh')
   }, [model, lang])
   const isOldVisionModel = useMemo(() => {
     return OldVisionModel.includes(model)
