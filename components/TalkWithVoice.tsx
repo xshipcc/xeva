@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect, memo } from 'react'
+import { useRef, useState, useEffect, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pause, Mic, Settings, LogOut } from 'lucide-react'
 import SiriWave from 'siriwave'
@@ -72,7 +72,7 @@ function TalkWithVoice({
         siriWave.setAmplitude(0.1)
       }
     }
-  }, [status, siriWave, onRecorder])
+  }, [status, siriWave])
 
   return (
     <div>

@@ -14,14 +14,16 @@ import {
   LogOut,
   Settings,
 } from 'lucide-react'
-import AudioPulse from './AudioPulse'
+import SiriWave from 'siriwave'
 import { Button } from '@/components/ui/button'
 import { useMultimodalLive } from '@/hooks/useMultimodalLive'
 import { useScreenCapture } from '@/hooks/useScreenCapture'
 import { useWebcam } from '@/hooks/useWebcam'
 import { AudioRecorder } from '@/lib/multimodal-live/audio-recorder'
-import type { UseMediaStreamResult } from '@/lib/multimodal-live/types'
+import type { UseMediaStreamResult, ServerContent } from '@/lib/multimodal-live/types'
 import { useMultimodalLiveStore } from '@/store/multimodal'
+import { useMessageStore } from '@/store/chat'
+import { useSettingStore } from '@/store/setting'
 import { cn } from '@/utils'
 
 type Props = {
@@ -37,6 +39,17 @@ type MediaStreamButtonProps = {
 }
 
 const Setting = dynamic(() => import('./Setting'))
+const SystemInstruction = dynamic(() => import('@/components/SystemInstruction'))
+
+const DefaultRoleSetting = `Your name is Gemini, you are a human AI. You need to follow the following requirements during the chat:
+
+- Communicate naturally like a real friend, and do not use honorifics
+- Do not always agree with users
+- Replies should be concise, and use colloquial vocabulary appropriately
+- Keep the content short, and most small talk can be replied in one sentence
+- Avoid using lists or enumeration expressions
+- Do not reply too much, and use short sentences to guide the conversation
+- Think and respond like a real person`
 
 /**
  * button used for triggering webcam or screen-capture
@@ -72,16 +85,19 @@ function MultimodalLive({ onClose }: Props) {
     voiceName,
     responseModalities,
   } = useMultimodalLiveStore()
-  const { client, connected, volume, setConfig, connect, disconnect } = useMultimodalLive({
+  const { apiKey: globalApiKey, model } = useSettingStore()
+  const { systemInstruction, instruction } = useMessageStore()
+  const { client, connected, setConfig, connect, disconnect } = useMultimodalLive({
     url: apiProxy,
-    apiKey,
+    apiKey: globalApiKey || apiKey,
   })
   const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const renderCanvasRef = useRef<HTMLCanvasElement>(null)
+  const siriWaveRef = useRef<HTMLDivElement>(null)
   const webcam = useWebcam()
   const screenCapture = useScreenCapture()
   const [activeVideoStream, setActiveVideoStream] = useState<MediaStream | null>(null)
+  const [subtitle, setSubtitle] = useState<string>('')
   const [muted, setMuted] = useState(false)
   const [supportsVideo, setSupportsVideo] = useState<boolean>(true)
   const [supportsScreenCapture, setSupportsScreenCapture] = useState<boolean>(true)
@@ -165,10 +181,6 @@ function MultimodalLive({ onClose }: Props) {
       if (renderCanvas.width + renderCanvas.height > 0) {
         // Draw the video screen to canvas
         ctx.drawImage(videoRef.current, 0, 0, renderCanvas.width, renderCanvas.height)
-        // Draw screen lines to canvas
-        if (canvasRef.current && canvasRef.current.width + canvasRef.current.height > 0) {
-          ctx.drawImage(canvasRef.current, 0, 0, renderCanvas.width, renderCanvas.height)
-        }
         const base64 = renderCanvas.toDataURL('image/jpeg', 1.0)
         const data = base64.slice(base64.indexOf(',') + 1, Infinity)
         client.sendRealtimeInput([{ mimeType: 'image/jpeg', data }])
@@ -183,22 +195,39 @@ function MultimodalLive({ onClose }: Props) {
     return () => {
       clearTimeout(timeoutId)
     }
-  }, [connected, activeVideoStream, client, videoRef, canvasRef])
-
-  useLayoutEffect(() => {
-    setSupportsVideo('getUserMedia' in navigator.mediaDevices)
-    setSupportsScreenCapture('getDisplayMedia' in navigator.mediaDevices)
-  }, [])
+  }, [connected, activeVideoStream, client, videoRef])
 
   useEffect(() => {
+    let siriWave: SiriWave
+    const { systemInstruction } = useMessageStore.getState()
+
+    const initSiriWave = () => {
+      siriWave = new SiriWave({
+        container: siriWaveRef.current!,
+        style: 'ios9',
+        speed: 0.04,
+        amplitude: 0.1,
+        width: window.innerWidth,
+        height: window.innerHeight / 5,
+      })
+    }
+    const resetSiriWave = () => {
+      siriWave?.dispose()
+      initSiriWave()
+    }
+    initSiriWave()
+
     setConfig({
-      model: 'models/gemini-2.0-flash-exp',
+      model: `models/${model}`,
       tools: [{ googleSearch: {} }],
       generationConfig: {
         responseModalities,
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName } },
         },
+      },
+      systemInstruction: {
+        parts: [{ text: systemInstruction }],
       },
     })
 
@@ -207,15 +236,79 @@ function MultimodalLive({ onClose }: Props) {
       client.send({ text: 'Hello' })
     }
 
-    client.addListener('setupcomplete', onSetupComplete)
-    return () => {
-      client.removeListener('setupcomplete', onSetupComplete)
+    const onAudio = () => {
+      if (siriWave) {
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+        siriWave.setSpeed(isSafari ? 0.1 : 0.05)
+        siriWave.setAmplitude(2)
+      }
     }
-  }, [client, setConfig, voiceName, responseModalities])
+
+    let timeoutId = -1
+    const onContent = (data: ServerContent) => {
+      if ('modelTurn' in data) {
+        const texts = []
+        for (const part of data.modelTurn.parts) {
+          if (part.text) texts.push(part.text)
+        }
+        clearTimeout(timeoutId)
+        setSubtitle(texts.join('\n\n'))
+      }
+    }
+
+    const onTurncomplete = () => {
+      if (siriWave) {
+        siriWave.setSpeed(0.04)
+        siriWave.setAmplitude(0.1)
+      }
+      timeoutId = window.setTimeout(() => {
+        setSubtitle('')
+      }, 1500)
+    }
+
+    const onClose = () => {
+      onTurncomplete()
+    }
+
+    window.addEventListener('resize', resetSiriWave)
+    client.addListener('setupcomplete', onSetupComplete)
+    client.addListener('audio', onAudio)
+    client.addListener('content', onContent)
+    client.addListener('turncomplete', onTurncomplete)
+    client.addListener('close', onClose)
+    return () => {
+      siriWave?.dispose()
+      client.removeListener('close', onClose)
+      client.removeListener('turncomplete', onTurncomplete)
+      client.removeListener('content', onContent)
+      client.removeListener('audio', onAudio)
+      client.removeListener('setupcomplete', onSetupComplete)
+      window.removeEventListener('resize', resetSiriWave)
+    }
+  }, [client, setConfig, voiceName, model, responseModalities])
+
+  useEffect(() => {
+    if (!systemInstruction) {
+      instruction(DefaultRoleSetting)
+    }
+    return () => {
+      if (systemInstruction === DefaultRoleSetting) {
+        instruction('')
+      }
+    }
+  }, [systemInstruction, instruction])
+
+  useLayoutEffect(() => {
+    setSupportsVideo('getUserMedia' in navigator.mediaDevices)
+    setSupportsScreenCapture('getDisplayMedia' in navigator.mediaDevices)
+  }, [])
 
   return (
     <div className="fixed left-0 right-0 top-0 z-50 flex h-full w-screen flex-col bg-slate-900">
       <div className="items-top relative h-full w-full justify-center">
+        <div className={cn('mx-auto h-full w-full max-w-screen-sm', { hidden: connected })}>
+          <SystemInstruction className="relative top-1/2 mx-4 -translate-y-1/2" maxHeight="300px" closeable={false} />
+        </div>
         <video
           className={cn('absolute h-full w-full flex-grow object-cover transition-all duration-300', {
             hidden: !videoRef.current || !isVideoStreaming,
@@ -229,8 +322,9 @@ function MultimodalLive({ onClose }: Props) {
             hidden: isVideoStreaming,
           })}
         >
-          <div className={cn('mt-16 h-8 translate-y-2 scale-150 items-center justify-center', { hidden: !connected })}>
-            <AudioPulse volume={volume} />
+          <div className={cn('mt-16 h-8 items-center justify-center', { hidden: !connected })}>
+            <div className={cn('h-1/5 w-full', { hidden: responseModalities === 'text' })} ref={siriWaveRef}></div>
+            <div className="whitespace-pre-wrap text-center text-red-300">{subtitle}</div>
           </div>
         </div>
 
@@ -238,8 +332,6 @@ function MultimodalLive({ onClose }: Props) {
           className="absolute left-1/2 z-20 flex -translate-x-1/2 flex-col items-center"
           style={{ bottom: 'var(--safe-area-inset-bottom)' }}
         >
-          <canvas className="hidden" ref={renderCanvasRef} />
-
           <div className={cn('absolute bottom-12 flex items-center justify-center gap-6', { hidden: connected })}>
             <Button
               className="h-10 w-10 rounded-full text-slate-700 dark:text-slate-500 [&_svg]:size-5"

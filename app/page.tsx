@@ -91,6 +91,7 @@ export default function Home() {
   const chatLayout = useMessageStore((state) => state.chatLayout)
   const files = useAttachmentStore((state) => state.files)
   const model = useSettingStore((state) => state.model)
+  const lang = useSettingStore((state) => state.lang)
   const [textareaHeight, setTextareaHeight] = useState<number>(TEXTAREA_DEFAULT_HEIGHT)
   const [content, setContent] = useState<string>('')
   const [message, setMessage] = useState<string>('')
@@ -107,6 +108,9 @@ export default function Home() {
   const [talkMode, setTalkMode] = useState<'chat' | 'voice'>('chat')
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
   const [status, setStatus] = useState<'thinkng' | 'silence' | 'talking'>('silence')
+  const canUseMultimodalLive = useMemo(() => {
+    return isFullGemini2Model(model) && !lang.includes('zh')
+  }, [model, lang])
   const isOldVisionModel = useMemo(() => {
     return OldVisionModel.includes(model)
   }, [model])
@@ -1118,7 +1122,7 @@ export default function Home() {
         </div>
       </div>
       {talkMode === 'voice' ? (
-        isFullGemini2Model(model) ? (
+        canUseMultimodalLive ? (
           <MultimodalLive onClose={() => setTalkMode('chat')} />
         ) : (
           <TalkWithVoice

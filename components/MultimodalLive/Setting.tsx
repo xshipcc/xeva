@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useMultimodalLiveStore } from '@/store/multimodal'
+import { useSettingStore } from '@/store/setting'
 import { voice } from '@/constant/multimodal'
+import { cn } from '@/utils'
 import { toPairs, omitBy, isFunction } from 'lodash-es'
 
 type SettingProps = {
@@ -27,6 +29,7 @@ const formSchema = z.object({
 
 function Setting({ open, onClose }: SettingProps) {
   const { t } = useTranslation()
+  const { apiKey: globalApiKey } = useSettingStore()
 
   const VoiceOptions = useCallback(() => {
     return toPairs(voice).map((kv) => {
@@ -83,7 +86,7 @@ function Setting({ open, onClose }: SettingProps) {
             control={form.control}
             name="apiKey"
             render={({ field }) => (
-              <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
+              <FormItem className={cn('grid grid-cols-4 items-center gap-4 space-y-0', { hidden: globalApiKey })}>
                 <FormLabel className="text-right">
                   <span className="leading-12 mr-1 text-red-500">*</span>
                   {t('geminiKey')}
