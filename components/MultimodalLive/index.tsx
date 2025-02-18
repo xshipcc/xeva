@@ -24,6 +24,7 @@ import type { UseMediaStreamResult, ServerContent } from '@/lib/multimodal-live/
 import { useMultimodalLiveStore } from '@/store/multimodal'
 import { useMessageStore } from '@/store/chat'
 import { useSettingStore } from '@/store/setting'
+import { getMultimodalLivePrompt, getClientContentPrompt } from '@/utils/prompt'
 import { cn } from '@/utils'
 
 type Props = {
@@ -40,16 +41,6 @@ type MediaStreamButtonProps = {
 
 const Setting = dynamic(() => import('./Setting'))
 const SystemInstruction = dynamic(() => import('@/components/SystemInstruction'))
-
-const DefaultRoleSetting = `Your name is Gemini, you are a human AI. You need to follow the following requirements during the chat:
-
-- Communicate naturally like a real friend, and do not use honorifics
-- Do not always agree with users
-- Replies should be concise, and use colloquial vocabulary appropriately
-- Keep the content short, and most small talk can be replied in one sentence
-- Avoid using lists or enumeration expressions
-- Do not reply too much, and use short sentences to guide the conversation
-- Think and respond like a real person`
 
 /**
  * button used for triggering webcam or screen-capture
@@ -232,8 +223,8 @@ function MultimodalLive({ onClose }: Props) {
     })
 
     const onSetupComplete = () => {
-      // Send a initial text message to let the model actively communicate with the user
-      client.send({ text: 'Hello' })
+      const { messages } = useMessageStore.getState()
+      client.send({ text: messages.length > 0 ? getClientContentPrompt(messages) : 'Hello' })
     }
 
     const onAudio = () => {
@@ -288,15 +279,17 @@ function MultimodalLive({ onClose }: Props) {
   }, [client, setConfig, voiceName, model, responseModalities])
 
   useEffect(() => {
+    const defaultRoleSetting = getMultimodalLivePrompt(voiceName)
+
     if (!systemInstruction) {
-      instruction(DefaultRoleSetting)
+      instruction(defaultRoleSetting)
     }
     return () => {
-      if (systemInstruction === DefaultRoleSetting) {
+      if (systemInstruction === defaultRoleSetting) {
         instruction('')
       }
     }
-  }, [systemInstruction, instruction])
+  }, [systemInstruction, instruction, voiceName])
 
   useLayoutEffect(() => {
     setSupportsVideo('getUserMedia' in navigator.mediaDevices)
