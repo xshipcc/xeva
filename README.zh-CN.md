@@ -282,6 +282,7 @@ vercel 部署后生成的域名在几年前就已经被国内网络屏蔽，但�
 #### 为什么我无法使用 Multimodal Live
 
 目前 Multimodal Live API 只有 Gemini 2.0 Flash 模型支持，因此需要使用 Gemini 2.0 Flash 模型才可以使用。由于在国内无法访问 Gemini Multimodal Live API，因此您可能需要使用 Cloudflare Worker 部署一个代理转发的 API。如何使用请参考 [使用 Cloudflare Worker 代理 Multimodal Live API](./docs/Proxying-the-Multimodal-Live-API-with-Cloudflare-Worker.zh-CN.md)。
+_目前 Multimodal Live API 尚不支持中文语音输出。_
 
 ## 致谢
 

@@ -302,6 +302,7 @@ function MultimodalLive({ onClose }: Props) {
         <div className={cn('mx-auto h-full w-full max-w-screen-sm', { hidden: connected })}>
           <SystemInstruction className="relative top-1/2 mx-4 -translate-y-1/2" maxHeight="300px" closeable={false} />
         </div>
+
         <video
           className={cn('absolute h-full w-full flex-grow object-cover transition-all duration-300', {
             hidden: !videoRef.current || !isVideoStreaming,
@@ -310,6 +311,8 @@ function MultimodalLive({ onClose }: Props) {
           autoPlay
           playsInline
         />
+        <canvas className="hidden" ref={renderCanvasRef} />
+
         <div
           className={cn('fixed left-1/2 top-[30%] flex -translate-x-1/2 flex-col items-center', {
             hidden: isVideoStreaming,

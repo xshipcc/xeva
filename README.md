@@ -297,6 +297,7 @@ The domain name generated after deploying Vercel was blocked by the Chinese netw
 #### Why can't I use Multimodal Live
 
 Currently, the Multimodal Live API is only supported by the Gemini 2.0 Flash model, so you need to use the Gemini 2.0 Flash model to use it. Since the Gemini Multimodal Live API is not accessible in China, you may need to deploy a proxy forwarding API using Cloudflare Worker. For more information, refer to [Proxying the Multimodal Live API with Cloudflare Worker](./docs/Proxying-the-Multimodal-Live-API-with-Cloudflare-Worker.md).
+_Currently, Multimodal Live API does not support Chinese voice output._
 
 ## Contributing
 
