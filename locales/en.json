@@ -71,7 +71,6 @@
   "text": "Text",
   "audio": "Audio",
   "image": "Image",
-  "multiModalLiveApiTip": "Please enter the proxy api url (Optional)",
   "exit": "Exit",
   "autoStartRecord": "Auto start recording",
   "autoStopRecord": "Auto end recording",

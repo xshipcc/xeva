@@ -79,7 +79,7 @@ function MultimodalLive({ onClose }: Props) {
   const { apiKey: globalApiKey, model } = useSettingStore()
   const { systemInstruction, instruction } = useMessageStore()
   const { client, connected, setConfig, connect, disconnect } = useMultimodalLive({
-    url: apiProxy,
+    url: `${apiProxy || 'wss://generativelanguage.googleapis.com'}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`,
     apiKey: globalApiKey || apiKey,
   })
   const videoRef = useRef<HTMLVideoElement>(null)
