@@ -121,7 +121,7 @@ function Setting({ open, onClose }: SettingProps) {
               <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                 <FormLabel className="text-right">{t('voiceName')}</FormLabel>
                 <FormControl>
-                  <Select defaultValue={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="col-span-3">
                       <SelectValue />
                     </SelectTrigger>
@@ -140,7 +140,7 @@ function Setting({ open, onClose }: SettingProps) {
               <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                 <FormLabel className="text-right">{t('responseType')}</FormLabel>
                 <FormControl>
-                  <Select defaultValue={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="col-span-3">
                       <SelectValue />
                     </SelectTrigger>

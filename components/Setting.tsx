@@ -292,7 +292,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                     <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                       <FormLabel className="text-right">{t('language')}</FormLabel>
                       <FormControl>
-                        <Select defaultValue={field.value} onValueChange={handleLangChange}>
+                        <Select value={field.value} onValueChange={handleLangChange}>
                           <SelectTrigger className="col-span-3">
                             <SelectValue placeholder={t('followTheSystem')} />
                           </SelectTrigger>
@@ -407,7 +407,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                       <FormControl>
                         <div className="col-span-3 flex gap-1">
                           <Select
-                            defaultValue={field.value}
+                            value={field.value}
                             onValueChange={(value) => {
                               field.onChange(value)
                               handleModelChange(value)
@@ -450,7 +450,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                         <div className="col-span-3 flex h-10">
                           <Slider
                             className="flex-1"
-                            defaultValue={[field.value]}
+                            value={[field.value]}
                             max={50}
                             step={1}
                             onValueChange={(values) => field.onChange(values[0])}
@@ -477,7 +477,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                         <div className="col-span-3 flex h-10">
                           <Slider
                             className="flex-1"
-                            defaultValue={[field.value]}
+                            value={[field.value]}
                             max={1}
                             step={0.01}
                             onValueChange={(values) => field.onChange(values[0])}
@@ -498,7 +498,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                         <div className="col-span-3 flex h-10">
                           <Slider
                             className="flex-1"
-                            defaultValue={[field.value]}
+                            value={[field.value]}
                             max={128}
                             step={1}
                             onValueChange={(values) => field.onChange(values[0])}
@@ -519,7 +519,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                         <div className="col-span-3 flex h-10">
                           <Slider
                             className="flex-1"
-                            defaultValue={[field.value]}
+                            value={[field.value]}
                             max={2}
                             step={0.1}
                             onValueChange={(values) => field.onChange(values[0])}
@@ -540,7 +540,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                         <div className="col-span-3 flex h-10">
                           <Slider
                             className="flex-1"
-                            defaultValue={[field.value]}
+                            value={[field.value]}
                             max={8192}
                             step={1}
                             onValueChange={(values) => field.onChange(values[0])}
@@ -561,7 +561,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                         <div className="col-span-3 flex h-10">
                           <RadioGroup
                             className="grid w-full grid-cols-4"
-                            defaultValue={field.value}
+                            value={field.value}
                             onValueChange={(value) => field.onChange(value)}
                           >
                             <div className="flex items-center space-x-2">
@@ -597,7 +597,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                     <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                       <FormLabel className="text-right">{t('speechRecognition')}</FormLabel>
                       <FormControl>
-                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="col-span-3">
                             <SelectValue placeholder={t('followTheSystem')} />
                           </SelectTrigger>
@@ -616,7 +616,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                     <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                       <FormLabel className="text-right">{t('speechSynthesis')}</FormLabel>
                       <FormControl>
-                        <Select defaultValue={field.value} onValueChange={handleTTSChange}>
+                        <Select value={field.value} onValueChange={handleTTSChange}>
                           <SelectTrigger className="col-span-3">
                             <SelectValue placeholder={t('followTheSystem')} />
                           </SelectTrigger>
@@ -635,7 +635,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                     <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                       <FormLabel className="text-right">{t('soundSource')}</FormLabel>
                       <FormControl>
-                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="col-span-3">
                             <SelectValue placeholder={t('followTheSystem')} />
                           </SelectTrigger>
