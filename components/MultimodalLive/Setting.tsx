@@ -47,6 +47,9 @@ function Setting({ open, onClose }: SettingProps) {
       return new Promise((resolve) => {
         const state = useMultimodalLiveStore.getState()
         const store = omitBy(state, (item) => isFunction(item)) as z.infer<typeof formSchema>
+        if (!store.apiProxy)
+          store.apiProxy =
+            'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent'
         setTimeout(() => {
           resolve(store)
         }, 500)

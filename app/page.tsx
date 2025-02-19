@@ -91,7 +91,6 @@ export default function Home() {
   const chatLayout = useMessageStore((state) => state.chatLayout)
   const files = useAttachmentStore((state) => state.files)
   const model = useSettingStore((state) => state.model)
-  const lang = useSettingStore((state) => state.lang)
   const [textareaHeight, setTextareaHeight] = useState<number>(TEXTAREA_DEFAULT_HEIGHT)
   const [content, setContent] = useState<string>('')
   const [message, setMessage] = useState<string>('')
@@ -109,8 +108,8 @@ export default function Home() {
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
   const [status, setStatus] = useState<'thinkng' | 'silence' | 'talking'>('silence')
   const canUseMultimodalLive = useMemo(() => {
-    return isFullGemini2FlashModel(model) && !lang.includes('zh')
-  }, [model, lang])
+    return isFullGemini2FlashModel(model)
+  }, [model])
   const isOldVisionModel = useMemo(() => {
     return OldVisionModel.includes(model)
   }, [model])
