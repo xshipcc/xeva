@@ -114,7 +114,10 @@ export default function Home() {
     return OldVisionModel.includes(model)
   }, [model])
   const isThinkingModel = useMemo(() => {
-    return model.includes('-thinking')
+    return model.includes('thinking')
+  }, [model])
+  const isLiteModel = useMemo(() => {
+    return model.includes('lite')
   }, [model])
   const supportAttachment = useMemo(() => {
     return !OldTextModel.includes(model)
@@ -187,7 +190,7 @@ export default function Home() {
       if (talkMode === 'voice') {
         config.systemInstruction = `${getVoiceModelPrompt()}\n\n${systemInstruction}`
       }
-      if (tools.length > 0 && !isThinkingModel) config.tools = [{ functionDeclarations: tools }]
+      if (tools.length > 0 && !isThinkingModel && !isLiteModel) config.tools = [{ functionDeclarations: tools }]
       if (apiKey !== '') {
         config.baseUrl = apiProxy || GEMINI_API_BASE_URL
       } else {
@@ -283,7 +286,7 @@ export default function Home() {
         }
       }
     },
-    [systemInstruction, isThinkingModel, talkMode],
+    [systemInstruction, isThinkingModel, isLiteModel, talkMode],
   )
 
   const summarize = useCallback(
@@ -864,12 +867,12 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (isOldVisionModel || isThinkingModel) {
+    if (isOldVisionModel || isThinkingModel || isLiteModel) {
       setEnablePlugin(false)
     } else {
       setEnablePlugin(true)
     }
-  }, [isOldVisionModel, isThinkingModel])
+  }, [isOldVisionModel, isThinkingModel, isLiteModel])
 
   useLayoutEffect(() => {
     const setting = useSettingStore.getState()
