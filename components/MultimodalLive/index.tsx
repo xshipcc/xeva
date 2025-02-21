@@ -126,7 +126,8 @@ function MultimodalLive({ onClose }: Props) {
 
   const handleConnect = () => {
     const { apiKey } = useMultimodalLiveStore.getState()
-    if (apiKey) {
+    const { apiKey: globalApiKey } = useSettingStore.getState()
+    if (apiKey || globalApiKey) {
       connect()
     } else {
       setOpenSetting(true)

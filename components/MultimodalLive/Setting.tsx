@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import { useMultimodalLiveStore } from '@/store/multimodal'
 import { useSettingStore } from '@/store/setting'
 import { voice } from '@/constant/multimodal'
-import { cn } from '@/utils'
 import { toPairs, omitBy, isFunction } from 'lodash-es'
 
 type SettingProps = {
@@ -47,6 +46,7 @@ function Setting({ open, onClose }: SettingProps) {
       return new Promise((resolve) => {
         const state = useMultimodalLiveStore.getState()
         const store = omitBy(state, (item) => isFunction(item)) as z.infer<typeof formSchema>
+        if (!store.apiKey) store.apiKey = globalApiKey
         setTimeout(() => {
           resolve(store)
         }, 500)
@@ -86,7 +86,7 @@ function Setting({ open, onClose }: SettingProps) {
             control={form.control}
             name="apiKey"
             render={({ field }) => (
-              <FormItem className={cn('grid grid-cols-4 items-center gap-4 space-y-0', { hidden: globalApiKey })}>
+              <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                 <FormLabel className="text-right">
                   <span className="leading-12 mr-1 text-red-500">*</span>
                   {t('geminiKey')}
@@ -104,12 +104,7 @@ function Setting({ open, onClose }: SettingProps) {
               <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                 <FormLabel className="text-right">{t('apiProxyUrl')}</FormLabel>
                 <FormControl>
-                  <Input
-                    className="col-span-3"
-                    placeholder="wss://generativelanguage.googleapis.com"
-                    disabled={form.getValues().apiKey === ''}
-                    {...field}
-                  />
+                  <Input className="col-span-3" placeholder="wss://generativelanguage.googleapis.com" {...field} />
                 </FormControl>
               </FormItem>
             )}
