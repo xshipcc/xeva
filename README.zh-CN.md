@@ -67,6 +67,10 @@
 
 支持插件功能，内置网络搜索、网页解读、论文搜索、实时天气等多种实用插件
 
+![Multimodal Live](./docs/images/multimodal-live.jpg)
+
+支持 Multimodal Live API，流畅的语音、视频体验
+
 ![Tray app](./docs/images/trayapp.png)
 
 跨平台的应用客户端，支持常驻菜单栏，让您的工作效率翻倍

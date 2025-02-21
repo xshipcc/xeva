@@ -108,7 +108,7 @@ export default function Home() {
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
   const [status, setStatus] = useState<'thinkng' | 'silence' | 'talking'>('silence')
   const canUseMultimodalLive = useMemo(() => {
-    return isFullGemini2FlashModel(model)
+    return model.startsWith('gemini-2.0-flash-exp')
   }, [model])
   const isOldVisionModel = useMemo(() => {
     return OldVisionModel.includes(model)

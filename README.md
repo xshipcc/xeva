@@ -67,6 +67,10 @@ Supports Gemini 1.5 and Gemini 2.0 multimodal models
 
 Support plugins, with built-in Web search, Web reader, Arxiv search, Weather and other practical plugins
 
+![Multimodal Live](./docs/images/multimodal-live.jpg)
+
+Support Multimodal Live API, smooth voice and video experience
+
 ![Tray app](./docs/images/trayapp.png)
 
 A cross-platform application client that supports a permanent menu bar, doubling your work efficiency
