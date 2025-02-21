@@ -5,6 +5,6 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Request camera access for Multimodal Live API</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Request microphone access for Multimodal Live API</string>
+	<string>Request microphone access for WebRecord</string>
 </dict>
 </plist>

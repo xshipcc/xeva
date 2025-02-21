@@ -10,11 +10,6 @@ export function useScreenCapture(): UseMediaStreamResult {
     // const controller = new CaptureController();
     // controller.setFocusBehavior("no-focus-change");
     const mediaStream = await navigator.mediaDevices.getDisplayMedia({
-      audio: {
-        echoCancellation: true, // Optional: Echo Cancellation
-        noiseSuppression: true, // Optional: Noise Reduction
-        autoGainControl: true, // Optional: Automatic gain control
-      },
       video: {
         displaySurface: 'monitor',
       },
