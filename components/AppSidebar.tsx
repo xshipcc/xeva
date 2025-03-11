@@ -403,7 +403,7 @@ function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  {pinnedList.map((item) => {
+                  {pinnedList.reverse().map((item) => {
                     return (
                       <ConversationItem
                         key={item.id}
@@ -425,7 +425,7 @@ function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  {list.map((item) => {
+                  {list.reverse().map((item) => {
                     return (
                       <ConversationItem
                         key={item.id}
