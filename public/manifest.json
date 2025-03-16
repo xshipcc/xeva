@@ -1,6 +1,6 @@
 {
-  "name": "Gemini Next Chat",
-  "short_name": "Gemini Next Chat",
+  "name": "XEva Chat",
+  "short_name": "XEva Chat",
   "description": "Deploy your private Gemini application for free with one click, supporting Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini Pro and Gemini Pro Vision models.",
   "id": "gemini-next-chat",
   "scope": ".",
