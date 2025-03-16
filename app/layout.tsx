@@ -4,8 +4,21 @@ import { Toaster } from '@/components/ui/toaster'
 import ThemeProvider from '@/components/ThemeProvider'
 import StoreProvider from '@/components/StoreProvider'
 import I18Provider from '@/components/I18nProvider'
-import { SidebarProvider } from '@/components/ui/sidebar'
-import AppSidebar from '@/components/AppSidebar'
+//old slider bar ,需要更新到新的bar代码 这样实现融合
+// import { SidebarProvider } from '@/components/ui/sidebar'
+// import AppSidebar from '@/components/AppSidebar'
+import { AppSidebar } from '../components/app-sidebar'
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 import './globals.css'
 
@@ -71,15 +84,50 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
+    // <html lang="en" dir="auto" suppressHydrationWarning>
+    //   <head>{HEAD_SCRIPTS ? <Script id="headscript">{HEAD_SCRIPTS}</Script> : null}</head>
+    //   <body>
+    //     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    //       <StoreProvider>
+    //         <I18Provider>
+    //           <SidebarProvider defaultOpen>
+    //             <AppSidebar />
+    //             {children}
+    //           </SidebarProvider>
+    //         </I18Provider>
+    //       </StoreProvider>
+    //     </ThemeProvider>
+    //     <Toaster />
+    //   </body>
+    // </html>
     <html lang="en" dir="auto" suppressHydrationWarning>
       <head>{HEAD_SCRIPTS ? <Script id="headscript">{HEAD_SCRIPTS}</Script> : null}</head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <StoreProvider>
             <I18Provider>
-              <SidebarProvider defaultOpen>
+              <SidebarProvider>
                 <AppSidebar />
-                {children}
+                <SidebarInset className="flex h-screen flex-col">
+                  <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                    <div className="flex items-center gap-2 px-4">
+                      <SidebarTrigger className="-ml-1" />
+                      <Separator orientation="vertical" className="mr-2 h-4" />
+                      <Breadcrumb>
+                        <BreadcrumbList>
+                          <BreadcrumbItem className="hidden md:block">
+                            <BreadcrumbLink href="#">Building Your Application</BreadcrumbLink>
+                          </BreadcrumbItem>
+                          <BreadcrumbSeparator className="hidden md:block" />
+                          <BreadcrumbItem>
+                            <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                          </BreadcrumbItem>
+                        </BreadcrumbList>
+                      </Breadcrumb>
+                    </div>
+                  </header>
+                  <div className="-mt-1 flex-1 overflow-auto">{children}</div>
+                </SidebarInset>
               </SidebarProvider>
             </I18Provider>
           </StoreProvider>

@@ -35,12 +35,14 @@ type SettingProps = {
   onClose: () => void
 }
 
+// 在 formSchema 中添加 deepseekApiKey 字段
 const formSchema = z.object({
   password: z.string().optional(),
   assistantIndexUrl: z.string().optional(),
   lang: z.string().optional(),
   apiKey: z.string().optional(),
   apiProxy: z.string().optional(),
+  deepseekApiKey: z.string().optional(), // 添加 DeepSeek API 密钥
   model: z.string(),
   maxHistoryLength: z.number().gte(0).lte(50).optional().default(0),
   topP: z.number(),
@@ -331,18 +333,7 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                 <div className="grid grid-cols-4 items-center gap-4 space-y-0">
                   <Label className="text-right">{t('version')}</Label>
                   <div className="col-span-3 text-center leading-10">
-                    {`v${pkg.version}`}{' '}
-                    <small>
-                      (
-                      <a
-                        className="underline underline-offset-2"
-                        href="https://github.com/u14app/gemini-next-chat/releases"
-                        target="_blank"
-                      >
-                        {t('checkForUpdate')}
-                      </a>
-                      )
-                    </small>
+                    {`v${pkg.version}`} <small>({t('checkForUpdate')})</small>
                   </div>
                 </div>
               </div>
@@ -363,6 +354,23 @@ function Setting({ open, hiddenTalkPanel, onClose }: SettingProps) {
                           className="col-span-3"
                           type="password"
                           placeholder={t('geminiKeyPlaceholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="deepseekApiKey"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
+                      <FormLabel className="text-right">DeepSeek API 密钥</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="col-span-3"
+                          type="password"
+                          placeholder="请输入 DeepSeek API 密钥"
                           {...field}
                         />
                       </FormControl>
