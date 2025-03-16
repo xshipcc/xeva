@@ -323,15 +323,28 @@ function MessageItem(props: Props) {
                 <Magicdown>{html}</Magicdown>
               </div>
               {groundingMetadata ? (
-                <div
-                  className="mx-0.5 my-2"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      groundingMetadata.searchEntryPoint?.renderedContent
-                        ?.replace('margin: 0 8px', 'margin: 0 4px')
-                        .replaceAll('<a', '<a target="_blank"') || '',
-                  }}
-                ></div>
+                <>
+                  <ul className="my-2 inline-flex gap-1">
+                    {groundingMetadata.groundingChunks.map((item, idx) => {
+                      return (
+                        <li className="rounded-full border bg-gray-50 px-4 py-1 dark:bg-gray-950" key={idx}>
+                          <a href={item.web?.uri} target="_blank">
+                            {item.web?.title}
+                          </a>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <div
+                    className="mx-0.5 my-2"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        groundingMetadata.searchEntryPoint?.renderedContent
+                          ?.replace('margin: 0 8px', 'margin: 0 4px')
+                          .replaceAll('<a', '<a target="_blank"') || '',
+                    }}
+                  ></div>
+                </>
               ) : null}
               <div
                 className={cn(
@@ -393,18 +406,6 @@ function MessageItem(props: Props) {
         }
       })
       let content = messageParts.join('')
-      if (groundingMetadata) {
-        const { groundingSupports = [], groundingChunks = [] } = groundingMetadata
-        groundingSupports.forEach((item) => {
-          if (item.segment) {
-            content = content.replace(
-              item.segment.text,
-              `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][gs-${indice}]]`).join('')}`,
-            )
-          }
-        })
-        content += `\n\n${groundingChunks.map((item, idx) => `[gs-${idx}]: <${item.web?.uri}> "${item.web?.title}"`).join('\n')}`
-      }
       setHtml(content)
     }
   }, [id, role, content, parts, attachments, groundingMetadata])
