@@ -47,46 +47,66 @@ const data = {
   ],
   navMain: [
     {
-      title: 'Playground',
+      title: '股指信息',
       url: '#',
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: 'History',
+          title: '综合选股',
+          url: '/stock-info/comprehensive',
+        },
+        {
+          title: '每日数据',
+          url: '/stock-info',
+        },
+        {
+          title: '资金流向',
+          url: '/stock-info/dashboard',
+        },
+        {
+          title: '分红配送',
           url: '#',
         },
         {
-          title: 'Starred',
+          title: '龙虎榜',
           url: '#',
         },
         {
-          title: 'Settings',
+          title: '大宗交易',
+          url: '#',
+        },
+        {
+          title: '行业资金流向',
+          url: '#',
+        },
+        {
+          title: '概念资金流向',
+          url: '#',
+        },
+        {
+          title: '每日ETF数据',
           url: '#',
         },
       ],
     },
     {
-      title: 'Models',
+      title: '通用塞选',
       url: '#',
       icon: Bot,
       items: [
         {
-          title: 'Genesis',
+          title: '基本面选股',
           url: '#',
         },
         {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
+          title: '收益率塞选',
           url: '#',
         },
       ],
     },
     {
-      title: 'Documentation',
+      title: '知识库',
       url: '#',
       icon: BookOpen,
       items: [
