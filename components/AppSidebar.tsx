@@ -245,7 +245,12 @@ function ConversationItem(props: Props) {
     >
       {editTitleMode ? (
         <div className="relative w-full">
-          <Input className="my-1 h-8" value={conversationTitle} onChange={(ev) => setCustomTitle(ev.target.value)} />
+          <Input
+            className="my-1 h-8"
+            value={customTitle}
+            onChange={(ev) => setCustomTitle(ev.target.value)}
+            autoFocus
+          />
           <Button
             className="absolute right-1 top-2 h-6 w-6"
             size="icon"
@@ -373,23 +378,22 @@ function AppSidebar() {
   }, [])
 
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className="flex justify-between p-2 pb-0">
-          <span className="text-lg font-semibold text-red-400">XEva Chat</span>
+    <SidebarGroup className="flex h-full flex-1 flex-col items-start justify-start pt-0">
+      <SidebarGroup className="mt-0 w-full pt-0">
+        <div className="flex justify-between p-2 pb-0 pt-0">
           <Button
-            className="h-8 w-8 [&_svg]:size-5"
+            className="mb-2 flex items-center gap-2 bg-blue-50 px-3 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30"
             variant="ghost"
-            size="icon"
             title={t('newConversation')}
             onClick={() => newConversation()}
           >
-            <MessageSquarePlus />
+            <MessageSquarePlus className="h-5 w-5" />
+            <span>开启新会话</span>
           </Button>
         </div>
         <SearchBar onSearch={handleSearch} onClear={handleClearKeyword} />
-      </SidebarHeader>
-      <SidebarContent className="gap-0">
+      </SidebarGroup>
+      <SidebarContent className="flex-1 gap-0 overflow-auto">
         <SidebarGroup className="py-0">
           <ConversationItem
             id="default"
@@ -441,7 +445,7 @@ function AppSidebar() {
           </SidebarGroup>
         ) : null}
       </SidebarContent>
-    </Sidebar>
+    </SidebarGroup>
   )
 }
 
