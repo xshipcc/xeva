@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, memo, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/navigation'
 import {
   MessageSquarePlus,
   EllipsisVertical,
@@ -79,6 +80,7 @@ function search(keyword: string, data: Record<string, Conversation>): Record<str
 function ConversationItem(props: Props) {
   const { id, title, pinned = false, isActive = false } = props
   const { t } = useTranslation()
+  const router = useRouter()
   const { pin, unpin, copy, remove } = useConversationStore()
   const { setTitle } = useMessageStore()
   const [customTitle, setCustomTitle] = useState<string>(title)
@@ -120,18 +122,34 @@ function ConversationItem(props: Props) {
 
   const handleSelect = useCallback(
     (id: string) => {
-      const { currentId, query, addOrUpdate, setCurrentId } = useConversationStore.getState()
-      const { title, backup, restore } = useMessageStore.getState()
-      const oldConversation = backup()
-      addOrUpdate(currentId, oldConversation)
+      try {
+        const { currentId, query, addOrUpdate, setCurrentId } = useConversationStore.getState()
+        const { title, backup, restore } = useMessageStore.getState()
 
-      const newConversation = query(id)
-      setCurrentId(id)
-      restore(newConversation)
+        // 备份当前会话
+        const oldConversation = backup()
+        addOrUpdate(currentId, oldConversation)
 
-      if (!title && currentId !== 'default') handleSummaryTitle(currentId)
+        // 获取并恢复新会话
+        const newConversation = query(id)
+        if (!newConversation) {
+          console.error(`会话 ${id} 不存在`)
+          return
+        }
+
+        setCurrentId(id)
+        restore(newConversation)
+
+        // 强制返回主聊天页面
+        router.push('/')
+
+        // 如果需要，生成标题
+        if (!title && currentId !== 'default') handleSummaryTitle(currentId)
+      } catch (error) {
+        console.error('切换会话时出错:', error)
+      }
     },
-    [handleSummaryTitle],
+    [handleSummaryTitle, router],
   )
 
   const editTitle = useCallback(
