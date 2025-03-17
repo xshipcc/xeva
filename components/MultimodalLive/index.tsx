@@ -213,7 +213,7 @@ function MultimodalLive({ onClose }: Props) {
       model: `models/${model}`,
       tools: [{ googleSearch: {} }],
       generationConfig: {
-        responseModalities,
+        responseModalities: [responseModalities],
         speechConfig: {
           voiceConfig: { prebuiltVoiceConfig: { voiceName } },
         },
@@ -320,7 +320,7 @@ function MultimodalLive({ onClose }: Props) {
           })}
         >
           <div className={cn('mt-16 h-8 items-center justify-center', { hidden: !connected })}>
-            <div className={cn('h-1/5 w-full', { hidden: responseModalities === 'text' })} ref={siriWaveRef}></div>
+            <div className={cn('h-1/5 w-full', { hidden: responseModalities === 'Text' })} ref={siriWaveRef}></div>
             <div className="whitespace-pre-wrap text-center text-red-300">{subtitle}</div>
           </div>
         </div>

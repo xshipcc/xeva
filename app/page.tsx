@@ -1,7 +1,7 @@
 'use client'
 import dynamic from 'next/dynamic'
 import { useRef, useState, useMemo, KeyboardEvent, useEffect, useCallback, useLayoutEffect } from 'react'
-import type { FunctionCall } from '@google/generative-ai'
+import type { FunctionCall, InlineDataPart } from '@xiangfa/generative-ai'
 import { AudioRecorder, EdgeSpeech, getRecordMineType } from '@xiangfa/polly'
 import {
   MessageCircleHeart,
@@ -37,7 +37,7 @@ import type { FileManagerOptions } from '@/utils/FileManager'
 import { fileUpload, imageUpload } from '@/utils/upload'
 import { findOperationById } from '@/utils/plugin'
 import { generateImages, type ImageGenerationRequest } from '@/utils/generateImages'
-import { detectLanguage, formatTime, readFileAsDataURL, isOfficeFile } from '@/utils/common'
+import { detectLanguage, formatTime, readFileAsDataURL, base64ToBlob, isOfficeFile } from '@/utils/common'
 import { cn } from '@/utils'
 import { GEMINI_API_BASE_URL } from '@/constant/urls'
 import { OldVisionModel, OldTextModel } from '@/constant/model'
@@ -52,6 +52,7 @@ interface AnswerParams {
   onResponse: (
     readableStream: ReadableStream,
     thoughtReadableStream: ReadableStream,
+    inlineDataReadableStream: ReadableStream,
     groundingSearchReadable: ReadableStream,
   ) => void
   onFunctionCall?: (functionCalls: FunctionCall[]) => void
@@ -90,6 +91,7 @@ export default function Home() {
   const systemInstructionEditMode = useMessageStore((state) => state.systemInstructionEditMode)
   const chatLayout = useMessageStore((state) => state.chatLayout)
   const files = useAttachmentStore((state) => state.files)
+  const references = useMessageStore((state) => state.references)
   const model = useSettingStore((state) => state.model)
   const [textareaHeight, setTextareaHeight] = useState<number>(TEXTAREA_DEFAULT_HEIGHT)
   const [content, setContent] = useState<string>('')
@@ -108,7 +110,7 @@ export default function Home() {
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
   const [status, setStatus] = useState<'thinkng' | 'silence' | 'talking'>('silence')
   const canUseMultimodalLive = useMemo(() => {
-    return model.startsWith('gemini-2.0-flash-exp')
+    return model.startsWith('gemini-2.0-flash-exp') && !model.includes('image')
   }, [model])
   const isOldVisionModel = useMemo(() => {
     return OldVisionModel.includes(model)
@@ -118,6 +120,9 @@ export default function Home() {
   }, [model])
   const isLiteModel = useMemo(() => {
     return model.includes('lite')
+  }, [model])
+  const isImageGenerationModel = useMemo(() => {
+    return model.includes('image-generation')
   }, [model])
   const supportAttachment = useMemo(() => {
     return !OldTextModel.includes(model)
@@ -213,6 +218,11 @@ export default function Home() {
             controller.enqueue(encoder.encode(chunk))
           },
         })
+        const { readable: inlineDataReadable, writable: inlineDataWritable } = new TransformStream({
+          transform(chunk, controller) {
+            controller.enqueue(encoder.encode(chunk))
+          },
+        })
         const { readable: groundingSearchReadable, writable: groundingSearchWritable } = new TransformStream({
           transform(chunk, controller) {
             controller.enqueue(encoder.encode(chunk))
@@ -220,8 +230,35 @@ export default function Home() {
         })
         const writer = writable.getWriter()
         const thoughtWriter = thoughtWritable.getWriter()
+        const inlineDataWriter = inlineDataWritable.getWriter()
         const groundingSearchWriter = groundingSearchWritable.getWriter()
-        onResponse(readable, thoughtReadable, groundingSearchReadable)
+        onResponse(readable, thoughtReadable, inlineDataReadable, groundingSearchReadable)
+
+        const handleImage = async (part: InlineDataPart) => {
+          // Compress image
+          const { default: imageCompression } = await import('browser-image-compression')
+          const compressionOptions = {
+            maxSizeMB: 4,
+            useWebWorker: true,
+            initialQuality: 0.85,
+            maxWidthOrHeight: 1024,
+            fileType: 'image/jpeg',
+            libURL: 'scripts/browser-image-compression.js',
+          }
+          const tmpImageFile = await imageCompression.getFilefromDataUrl(
+            `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`,
+            'image.png',
+          )
+          const compressedImage = await imageCompression(tmpImageFile, compressionOptions)
+          const imageDataURL = await imageCompression.getDataUrlFromFile(compressedImage)
+          const inlineData = JSON.stringify({
+            mimeType: 'image/jpeg',
+            data: imageDataURL.split(';base64,')[1],
+          })
+          const { references } = useMessageStore.getState()
+          writer.write(`\n![image.jpg][image-${references.length}]\n`)
+          inlineDataWriter.write(inlineData)
+        }
 
         const functionCalls: FunctionCall[][] = []
 
@@ -230,7 +267,7 @@ export default function Home() {
 
           if (chunk.candidates) {
             const candidates: any[] = chunk.candidates
-            candidates.forEach((item) => {
+            for (const item of candidates) {
               if (item.content.parts) {
                 if (thinking) {
                   const textParts = item.content.parts.filter((item: any) => !isUndefined(item.text))
@@ -253,11 +290,13 @@ export default function Home() {
                     }
                   }
                 } else {
-                  const text = chunk.text()
-                  if (thinking) {
-                    thoughtWriter.write(text)
-                  } else {
-                    writer.write(text)
+                  for (const part of item.content.parts) {
+                    if (part.text) {
+                      writer.write(part.text)
+                    }
+                    if (part.inlineData?.mimeType.startsWith('image/')) {
+                      await handleImage(part)
+                    }
                   }
                 }
               } else if (item.finishMessage) {
@@ -266,7 +305,7 @@ export default function Home() {
               if (item.groundingMetadata) {
                 groundingSearchWriter.write(JSON.stringify(item.groundingMetadata))
               }
-            })
+            }
           }
 
           const calls = chunk.functionCalls()
@@ -275,6 +314,8 @@ export default function Home() {
 
         writer.close()
         thoughtWriter.close()
+        inlineDataWriter.close()
+        groundingSearchWriter.close()
 
         if (isFunction(onFunctionCall)) {
           onFunctionCall(flatten(functionCalls))
@@ -321,14 +362,16 @@ export default function Home() {
     (
       readableStream: ReadableStream,
       thoughtReadableStream: ReadableStream,
+      inlineDataReadableStream: ReadableStream,
       groundingSearchReadableStream: ReadableStream,
     ) => {
       const { lang, maxHistoryLength } = useSettingStore.getState()
-      const { summary, add: addMessage } = useMessageStore.getState()
+      const { summary, add: addMessage, clearReference } = useMessageStore.getState()
       speechQueue.current = new PromiseQueue()
       setSpeechSilence(false)
       let text = ''
       let thoughtText = ''
+      let imageList: InlineDataPart[] = []
       let groundingSearch: Message['groundingMetadata']
       textStream({
         readable: readableStream,
@@ -351,15 +394,20 @@ export default function Home() {
             role: 'model',
             parts: [],
           }
+          message.parts = []
           if (text !== '') {
             message.parts = thoughtText !== '' ? [{ text: thoughtText }, { text }] : [{ text }]
           } else if (thoughtText !== '') {
             message.parts = [{ text: thoughtText }]
           }
+          if (imageList.length > 0) {
+            message.parts = [...message.parts, ...imageList]
+          }
           if (groundingSearch) message.groundingMetadata = groundingSearch
           addMessage(message)
           setMessage('')
           setThinkingMessage('')
+          clearReference()
           setIsThinking(false)
           stopGeneratingRef.current = false
           setExecutingPlugins([])
@@ -382,6 +430,17 @@ export default function Home() {
         onMessage: (content) => {
           thoughtText += content
           setThinkingMessage(thoughtText)
+        },
+      })
+      simpleTextStream({
+        readable: inlineDataReadableStream,
+        onMessage: (content) => {
+          const { updateReference } = useMessageStore.getState()
+          const inlineData: InlineDataPart['inlineData'] = JSON.parse(content)
+          if (inlineData.mimeType.startsWith('image/')) {
+            imageList.push({ inlineData })
+          }
+          updateReference({ inlineData })
         },
       })
       simpleTextStream({
@@ -867,12 +926,12 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (isOldVisionModel || isThinkingModel || isLiteModel) {
+    if (isOldVisionModel || isThinkingModel || isLiteModel || isImageGenerationModel) {
       setEnablePlugin(false)
     } else {
       setEnablePlugin(true)
     }
-  }, [isOldVisionModel, isThinkingModel, isLiteModel])
+  }, [isOldVisionModel, isThinkingModel, isLiteModel, isImageGenerationModel])
 
   useLayoutEffect(() => {
     const setting = useSettingStore.getState()
@@ -974,7 +1033,11 @@ export default function Home() {
                     id="message"
                     role="model"
                     parts={
-                      thinkingMessage !== '' ? [{ text: thinkingMessage }, { text: message }] : [{ text: message }]
+                      thinkingMessage !== ''
+                        ? [{ text: thinkingMessage }, { text: message }]
+                        : references.length > 0
+                          ? [{ text: message }, ...references]
+                          : [{ text: message }]
                     }
                   />
                 </div>

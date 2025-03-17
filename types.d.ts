@@ -1,4 +1,4 @@
-import type { Content, GroundingMetadata } from '@google/generative-ai'
+import type { Content, GroundingMetadata } from '@xiangfa/generative-ai'
 import type { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types'
 
 declare global {

@@ -22,6 +22,14 @@
   @apply font-semibold;
 }
 
+.markdown img {
+  @apply my-4 rounded-md bg-gray-100;
+}
+
+.markdown hr {
+  @apply my-4;
+}
+
 .markdown a {
   @apply text-blue-600 dark:text-blue-400;
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, type StorageValue } from 'zustand/middleware'
 import storage from '@/utils/Storage'
-import { type FunctionDeclaration } from '@google/generative-ai'
+import { type FunctionDeclaration } from '@xiangfa/generative-ai'
 import { find, findIndex, filter, omitBy, isFunction } from 'lodash-es'
 
 type PluginStore = {

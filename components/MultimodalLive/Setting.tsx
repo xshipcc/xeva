@@ -23,7 +23,7 @@ const formSchema = z.object({
   apiKey: z.string(),
   apiProxy: z.string().optional(),
   voiceName: z.string(),
-  responseModalities: z.enum(['text', 'audio', 'image']),
+  responseModalities: z.string().optional(),
 })
 
 function Setting({ open, onClose }: SettingProps) {
@@ -140,9 +140,9 @@ function Setting({ open, onClose }: SettingProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="text">{t('text')}</SelectItem>
-                      <SelectItem value="audio">{t('audio')}</SelectItem>
-                      {/* <SelectItem value="image">{t('image')}</SelectItem> */}
+                      <SelectItem value="Text">{t('text')}</SelectItem>
+                      <SelectItem value="Audio">{t('audio')}</SelectItem>
+                      {/* <SelectItem value="Image">{t('image')}</SelectItem> */}
                     </SelectContent>
                   </Select>
                 </FormControl>

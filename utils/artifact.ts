@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, type ModelParams } from '@google/generative-ai'
+import { GoogleGenerativeAI, type ModelParams } from '@xiangfa/generative-ai'
 import {
   AIWritePrompt,
   changeArtifactLanguage,
