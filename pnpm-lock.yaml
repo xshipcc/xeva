@@ -71,15 +71,12 @@ importers:
       '@serwist/next':
         specifier: ^9.0.10
         version: 9.0.10(next@14.2.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.4.5)
-<<<<<<< HEAD
       '@tanstack/react-table':
         specifier: ^8.21.2
         version: 8.21.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-=======
       '@xiangfa/generative-ai':
         specifier: ^0.25.1
         version: 0.25.1
->>>>>>> origin_main
       '@xiangfa/polly':
         specifier: ^0.4.3
         version: 0.4.3
@@ -128,9 +125,6 @@ importers:
       i18next-resources-to-backend:
         specifier: ^1.2.1
         version: 1.2.1
-      klinecharts:
-        specifier: ^9.0.0
-        version: 9.8.12
       localforage:
         specifier: ^1.10.0
         version: 1.10.0
@@ -158,9 +152,6 @@ importers:
       react:
         specifier: ^18.3.1
         version: 18.3.1
-      react-day-picker:
-        specifier: ^8.7.1
-        version: 8.10.1(date-fns@4.1.0)(react@18.3.1)
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -3349,12 +3340,6 @@ packages:
   radash@12.1.0:
     resolution: {integrity: sha512-b0Zcf09AhqKS83btmUeYBS8tFK7XL2e3RvLmZcm0sTdF1/UUlHSsjXdCcWNxe7yfmAlPve5ym0DmKGtTzP6kVQ==}
     engines: {node: '>=14.18.0'}
-
-  react-day-picker@8.10.1:
-    resolution: {integrity: sha512-TMx7fNbhLk15eqcMt+7Z7S2KF7mfTId/XJDjKE8f+IUcFn0l08/kI4FiYTL/0yuOLmEcbR4Fwe3GJf/NiiMnPA==}
-    peerDependencies:
-      date-fns: ^2.28.0 || ^3.0.0
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
   react-dom@18.3.1:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
@@ -7636,11 +7621,6 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   radash@12.1.0: {}
-
-  react-day-picker@8.10.1(date-fns@4.1.0)(react@18.3.1):
-    dependencies:
-      date-fns: 4.1.0
-      react: 18.3.1
 
   react-dom@18.3.1(react@18.3.1):
     dependencies:
