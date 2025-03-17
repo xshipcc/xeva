@@ -405,8 +405,8 @@ function AppSidebar() {
         </div>
         <SearchBar onSearch={handleSearch} onClear={handleClearKeyword} />
       </SidebarGroup>
-      <SidebarContent className="flex-1 gap-0 overflow-auto">
-        <SidebarGroup className="py-0">
+      <SidebarContent className="w-full flex-1 gap-0 overflow-auto ">
+        <SidebarGroup className="flex w-full">
           <ConversationItem
             id="default"
             title={t('defaultConversation')}
