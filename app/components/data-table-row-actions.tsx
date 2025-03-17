@@ -18,7 +18,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-import { labels } from '../data/data'
+import { Tlabels } from '../data/data'
+import { stocklabels } from '../data/stockdata'
+
+import { stockSchema } from '../data/schema'
 import { taskSchema } from '../data/schema'
 
 interface DataTableRowActionsProps<TData> {
@@ -26,7 +29,22 @@ interface DataTableRowActionsProps<TData> {
 }
 
 export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TData>) {
-  const task = taskSchema.parse(row.original)
+  let name = '未知'
+  let labels = Tlabels
+  try {
+    const stock = stockSchema.safeParse(row.original)
+    if (stock.success) {
+      name = stock.data.股票名称
+      labels = stocklabels
+    } else {
+      const task = taskSchema.safeParse(row.original)
+      if (task.success) {
+        name = task.data.title
+      }
+    }
+  } catch (error) {
+    console.error('Failed to parse row data:', error)
+  }
 
   return (
     <DropdownMenu>
@@ -44,7 +62,7 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuRadioGroup value={task.label}>
+            <DropdownMenuRadioGroup value={name}>
               {labels.map((label) => (
                 <DropdownMenuRadioItem key={label.value} value={label.value}>
                   {label.label}

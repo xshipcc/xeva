@@ -5,7 +5,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 
-import { labels, priorities, statuses } from '../data/data'
+import { Tlabels, priorities, statuses } from '../data/data'
 import { Task } from '../data/schema'
 import { DataTableColumnHeader } from './data-table-column-header'
 import { DataTableRowActions } from './data-table-row-actions'
@@ -43,7 +43,7 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: 'title',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label)
+      const label = Tlabels.find((label) => label.value === row.original.label)
 
       return (
         <div className="flex space-x-2">

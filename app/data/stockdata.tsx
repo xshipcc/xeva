@@ -1,21 +1,29 @@
 import { ArrowDown, ArrowRight, ArrowUp, CheckCircle, Circle, CircleOff, HelpCircle, Timer } from 'lucide-react'
 
-export const Tlabels = [
+export const stocklabels = [
   {
-    value: 'bug',
-    label: 'Bug',
+    value: '今开',
+    label: '今开',
   },
   {
-    value: 'feature',
-    label: 'Feature',
+    value: '涨跌幅',
+    label: '涨跌幅',
   },
   {
-    value: 'documentation',
-    label: 'Documentation',
+    value: '成交量',
+    label: '成交量',
+  },
+  {
+    value: '换手率',
+    label: '换手率',
+  },
+  {
+    value: '涨速',
+    label: '涨速',
   },
 ]
 
-export const statuses = [
+export const stockstatuses = [
   {
     value: 'backlog',
     label: 'Backlog',
@@ -43,7 +51,7 @@ export const statuses = [
   },
 ]
 
-export const priorities = [
+export const stockpriorities = [
   {
     label: 'Low',
     value: 'low',

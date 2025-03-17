@@ -91,16 +91,31 @@ const data = {
       ],
     },
     {
-      title: '通用塞选',
+      title: '期货',
       url: '#',
       icon: Bot,
       items: [
         {
-          title: '基本面选股',
+          title: '期货基本面',
           url: '#',
         },
         {
-          title: '收益率塞选',
+          title: '期货每日数据',
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: '数字货币',
+      url: '#',
+      icon: Bot,
+      items: [
+        {
+          title: 'B基本面',
+          url: '#',
+        },
+        {
+          title: 'B每日数据',
           url: '#',
         },
       ],
@@ -128,29 +143,30 @@ const data = {
         },
       ],
     },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
-      ],
-    },
+    //,
+    // {
+    //   title: 'Settings',
+    //   url: '#',
+    //   icon: Settings2,
+    //   items: [
+    //     {
+    //       title: 'General',
+    //       url: '#',
+    //     },
+    //     {
+    //       title: 'Team',
+    //       url: '#',
+    //     },
+    //     {
+    //       title: 'Billing',
+    //       url: '#',
+    //     },
+    //     {
+    //       title: 'Limits',
+    //       url: '#',
+    //     },
+    // ],
+    // },
   ],
   projects: [
     {

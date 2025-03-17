@@ -37,20 +37,24 @@ export default function DashboardPage() {
       </div> */}
       <div className="hidden flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">阿里巴巴</h2>
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-between space-y-1">
+            <div className="flex items-center space-x-1">
               <Search />
               <Button>搜索</Button>
             </div>
           </div>
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="reports">Reports</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            </TabsList>
+            <div className="flex items-center justify-between space-y-2">
+              <h2 className="text-3xl font-bold tracking-tight">阿里巴巴</h2>
+              <TabsList className="justify-end">
+                <TabsTrigger value="overview">概览</TabsTrigger>
+                <TabsTrigger value="analytics">资金</TabsTrigger>
+                <TabsTrigger value="notifications">资讯</TabsTrigger>
+                <TabsTrigger value="finance">财务</TabsTrigger>
+                <TabsTrigger value="reports">分析</TabsTrigger>
+              </TabsList>
+            </div>
+
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
