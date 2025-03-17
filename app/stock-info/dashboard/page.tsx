@@ -10,8 +10,9 @@ import { MainNav } from './components/main-nav'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
 import { Search } from './components/search'
+import KLineChart from '@/components/KLineChartPro'
 export const metadata: Metadata = {
-  title: 'Dashboard',
+  title: '阿里巴巴',
   description: 'Example dashboard app built using the components.',
 }
 
@@ -37,7 +38,7 @@ export default function DashboardPage() {
       <div className="hidden flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <h2 className="text-3xl font-bold tracking-tight">阿里巴巴</h2>
             <div className="flex items-center space-x-2">
               <Search />
               <Button>搜索</Button>
@@ -46,15 +47,9 @@ export default function DashboardPage() {
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
-                Notifications
-              </TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="reports">Reports</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -146,6 +141,9 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               </div>
+              <Card>
+                <KLineChart />
+              </Card>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
                   <CardHeader>
