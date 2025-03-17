@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI } from '@xiangfa/generative-ai'
 import { DefaultModel } from '@/constant/model'
 import { getRandomKey } from '@/utils/common'
 import { getSummaryTitlePrompt } from '@/utils/prompt'

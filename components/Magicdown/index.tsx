@@ -86,6 +86,7 @@ function Magicdown({ children: content, className, ...rest }: Options) {
         },
         ...components,
       }}
+      urlTransform={(value: string) => value}
     >
       {content}
     </Markdown>

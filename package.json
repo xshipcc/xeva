@@ -1,6 +1,6 @@
 {
   "name": "gemini-next-chat",
-  "version": "1.9.3",
+  "version": "1.10.0",
   "private": true,
   "author": "Amery2010 <amery@xiangfa.org>",
   "license": "MIT",
@@ -16,7 +16,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.0",
@@ -36,6 +35,7 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@serwist/next": "^9.0.10",
+    "@xiangfa/generative-ai": "^0.25.1",
     "@xiangfa/polly": "^0.4.3",
     "@zip.js/zip.js": "^2.7.57",
     "browser-image-compression": "^2.0.2",

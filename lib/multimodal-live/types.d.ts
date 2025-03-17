@@ -1,4 +1,4 @@
-import type { Content, FunctionCall, GenerationConfig, GenerativeContentBlob, Part, Tool } from '@google/generative-ai'
+import type { Content, FunctionCall, GenerationConfig, GenerativeContentBlob, Part, Tool } from '@xiangfa/generative-ai'
 
 /**
  * this module contains type-definitions and Type-Guards
@@ -19,7 +19,7 @@ export type LiveConfig = {
 }
 
 export type LiveGenerationConfig = GenerationConfig & {
-  responseModalities: 'text' | 'audio' | 'image'
+  responseModalities: string[]
   speechConfig?: {
     voiceConfig?: {
       prebuiltVoiceConfig?: {

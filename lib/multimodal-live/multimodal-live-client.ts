@@ -1,4 +1,4 @@
-import { Content, GenerativeContentBlob, Part } from '@google/generative-ai'
+import { Content, GenerativeContentBlob, Part } from '@xiangfa/generative-ai'
 import { EventEmitter } from 'eventemitter3'
 import {
   blobToJSON,

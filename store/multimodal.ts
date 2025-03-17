@@ -7,7 +7,7 @@ export interface MultimodalLiveStore {
   apiKey: string
   apiProxy: string
   voiceName: string
-  responseModalities: 'text' | 'audio' | 'image'
+  responseModalities: string
   isVideoStreaming: boolean
   update: (values: Partial<MultimodalLiveStore>) => void
 }
@@ -18,7 +18,7 @@ export const useMultimodalLiveStore = create(
       apiKey: '',
       apiProxy: '',
       voiceName: 'Aoede',
-      responseModalities: 'audio',
+      responseModalities: 'Audio',
       isVideoStreaming: false,
       update: (values) => set((state) => ({ ...state, ...values })),
     }),

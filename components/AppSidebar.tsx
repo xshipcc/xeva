@@ -215,14 +215,8 @@ function ConversationItem(props: Props) {
           } else if (part.text) {
             let content = part.text
             if (item.groundingMetadata) {
-              const { groundingSupports = [], groundingChunks = [] } = item.groundingMetadata
-              groundingSupports.forEach((item) => {
-                content = content.replace(
-                  item.segment.text,
-                  `${item.segment.text}${item.groundingChunkIndices.map((indice) => `[[${indice + 1}][gs-${indice}]]`).join('')}`,
-                )
-              })
-              content += `\n\n${groundingChunks.map((item, idx) => `[gs-${idx}]: <${item.web?.uri}> "${item.web?.title}"`).join('\n')}`
+              const { groundingChunks = [] } = item.groundingMetadata
+              content += `\n\n---\n\n${groundingChunks.map((item) => `- [${item.web?.title}](${item.web?.uri})`).join('\n')}`
             }
             mdContentList.push(content)
           }

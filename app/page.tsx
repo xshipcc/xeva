@@ -1,8 +1,9 @@
 'use client'
 import dynamic from 'next/dynamic'
 import { useRef, useState, useMemo, KeyboardEvent, useEffect, useCallback, useLayoutEffect } from 'react'
-import type { FunctionCall } from '@google/generative-ai'
+import type { FunctionCall, InlineDataPart } from '@xiangfa/generative-ai'
 import { AudioRecorder, EdgeSpeech, getRecordMineType } from '@xiangfa/polly'
+import { Md5 } from 'ts-md5'
 import {
   MessageCircleHeart,
   AudioLines,
@@ -52,6 +53,7 @@ interface AnswerParams {
   onResponse: (
     readableStream: ReadableStream,
     thoughtReadableStream: ReadableStream,
+    inlineDataReadableStream: ReadableStream,
     groundingSearchReadable: ReadableStream,
   ) => void
   onFunctionCall?: (functionCalls: FunctionCall[]) => void
@@ -93,6 +95,7 @@ export default function Home() {
   const model = useSettingStore((state) => state.model)
   const [textareaHeight, setTextareaHeight] = useState<number>(TEXTAREA_DEFAULT_HEIGHT)
   const [content, setContent] = useState<string>('')
+  const [references, setReferences] = useState<InlineDataPart[]>([])
   const [message, setMessage] = useState<string>('')
   const [thinkingMessage, setThinkingMessage] = useState<string>('')
   const [subtitle, setSubtitle] = useState<string>('')
@@ -118,6 +121,9 @@ export default function Home() {
   }, [model])
   const isLiteModel = useMemo(() => {
     return model.includes('lite')
+  }, [model])
+  const isImageGenerationModel = useMemo(() => {
+    return model.includes('image-generation')
   }, [model])
   const supportAttachment = useMemo(() => {
     return !OldTextModel.includes(model)
@@ -213,6 +219,11 @@ export default function Home() {
             controller.enqueue(encoder.encode(chunk))
           },
         })
+        const { readable: inlineDataReadable, writable: inlineDataWritable } = new TransformStream({
+          transform(chunk, controller) {
+            controller.enqueue(encoder.encode(chunk))
+          },
+        })
         const { readable: groundingSearchReadable, writable: groundingSearchWritable } = new TransformStream({
           transform(chunk, controller) {
             controller.enqueue(encoder.encode(chunk))
@@ -220,8 +231,9 @@ export default function Home() {
         })
         const writer = writable.getWriter()
         const thoughtWriter = thoughtWritable.getWriter()
+        const inlineDataWriter = inlineDataWritable.getWriter()
         const groundingSearchWriter = groundingSearchWritable.getWriter()
-        onResponse(readable, thoughtReadable, groundingSearchReadable)
+        onResponse(readable, thoughtReadable, inlineDataReadable, groundingSearchReadable)
 
         const functionCalls: FunctionCall[][] = []
 
@@ -253,11 +265,16 @@ export default function Home() {
                     }
                   }
                 } else {
-                  const text = chunk.text()
-                  if (thinking) {
-                    thoughtWriter.write(text)
-                  } else {
-                    writer.write(text)
+                  for (const part of item.content.parts) {
+                    if (part.text) {
+                      writer.write(part.text)
+                    }
+                    if (part.inlineData) {
+                      const inlineData = JSON.stringify(part.inlineData)
+                      inlineDataWriter.write(inlineData)
+                      const imageMd5 = Md5.hashStr(inlineData)
+                      writer.write(`\n\n![${imageMd5}][image-${imageMd5}]\n\n`)
+                    }
                   }
                 }
               } else if (item.finishMessage) {
@@ -275,6 +292,8 @@ export default function Home() {
 
         writer.close()
         thoughtWriter.close()
+        inlineDataWriter.close()
+        groundingSearchWriter.close()
 
         if (isFunction(onFunctionCall)) {
           onFunctionCall(flatten(functionCalls))
@@ -321,6 +340,7 @@ export default function Home() {
     (
       readableStream: ReadableStream,
       thoughtReadableStream: ReadableStream,
+      inlineDataReadableStream: ReadableStream,
       groundingSearchReadableStream: ReadableStream,
     ) => {
       const { lang, maxHistoryLength } = useSettingStore.getState()
@@ -329,6 +349,7 @@ export default function Home() {
       setSpeechSilence(false)
       let text = ''
       let thoughtText = ''
+      let imageList: InlineDataPart[] = []
       let groundingSearch: Message['groundingMetadata']
       textStream({
         readable: readableStream,
@@ -351,15 +372,20 @@ export default function Home() {
             role: 'model',
             parts: [],
           }
+          message.parts = []
           if (text !== '') {
             message.parts = thoughtText !== '' ? [{ text: thoughtText }, { text }] : [{ text }]
           } else if (thoughtText !== '') {
             message.parts = [{ text: thoughtText }]
           }
+          if (imageList.length > 0) {
+            message.parts = [...message.parts, ...imageList]
+          }
           if (groundingSearch) message.groundingMetadata = groundingSearch
           addMessage(message)
           setMessage('')
           setThinkingMessage('')
+          setReferences([])
           setIsThinking(false)
           stopGeneratingRef.current = false
           setExecutingPlugins([])
@@ -385,13 +411,23 @@ export default function Home() {
         },
       })
       simpleTextStream({
+        readable: inlineDataReadableStream,
+        onMessage: (content) => {
+          const inlineData: InlineDataPart['inlineData'] = JSON.parse(content)
+          if (inlineData.mimeType.startsWith('image/')) {
+            imageList.push({ inlineData })
+          }
+          setReferences([...references, { inlineData }])
+        },
+      })
+      simpleTextStream({
         readable: groundingSearchReadableStream,
         onMessage: (content) => {
           groundingSearch = JSON.parse(content)
         },
       })
     },
-    [speech, summarize, setThinkingMessage, talkMode],
+    [speech, summarize, setThinkingMessage, talkMode, references],
   )
 
   const handleFunctionCall = useCallback(
@@ -867,12 +903,12 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (isOldVisionModel || isThinkingModel || isLiteModel) {
+    if (isOldVisionModel || isThinkingModel || isLiteModel || isImageGenerationModel) {
       setEnablePlugin(false)
     } else {
       setEnablePlugin(true)
     }
-  }, [isOldVisionModel, isThinkingModel, isLiteModel])
+  }, [isOldVisionModel, isThinkingModel, isLiteModel, isImageGenerationModel])
 
   useLayoutEffect(() => {
     const setting = useSettingStore.getState()
@@ -979,7 +1015,11 @@ export default function Home() {
                     id="message"
                     role="model"
                     parts={
-                      thinkingMessage !== '' ? [{ text: thinkingMessage }, { text: message }] : [{ text: message }]
+                      thinkingMessage !== ''
+                        ? [{ text: thinkingMessage }, { text: message }]
+                        : references.length > 0
+                          ? [{ text: message }, ...references]
+                          : [{ text: message }]
                     }
                   />
                 </div>
