@@ -325,7 +325,7 @@ function MessageItem(props: Props) {
               {groundingMetadata ? (
                 <>
                   <ul className="my-2 inline-flex gap-1">
-                    {groundingMetadata.groundingChunks.map((item, idx) => {
+                    {groundingMetadata.groundingChunks?.map((item, idx) => {
                       return (
                         <li className="rounded-full border bg-gray-50 px-4 py-1 dark:bg-gray-950" key={idx}>
                           <a href={item.web?.uri} target="_blank">
