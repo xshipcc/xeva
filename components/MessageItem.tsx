@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic'
 import { useEffect, useState, useCallback, useRef, useMemo, memo } from 'react'
 import type { InlineDataPart } from '@xiangfa/generative-ai'
 import { useTranslation } from 'react-i18next'
-import { Md5 } from 'ts-md5'
 import Lightbox from 'yet-another-react-lightbox'
 import LightboxFullscreen from 'yet-another-react-lightbox/plugins/fullscreen'
 import {
@@ -418,10 +417,7 @@ function MessageItem(props: Props) {
         content +=
           '\n\n' +
           inlineImageList
-            .map(
-              (item) =>
-                `[image-${Md5.hashStr(JSON.stringify(item))}]: <${`data:${item.mimeType};base64,${item.data}`}>`,
-            )
+            .map((item, idx) => `[image-${idx}]: <${`data:${item.mimeType};base64,${item.data}`}>`)
             .join('\n')
       }
       setHtml(content)

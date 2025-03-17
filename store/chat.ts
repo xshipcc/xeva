@@ -1,11 +1,13 @@
 import { create } from 'zustand'
 import { persist, type StorageValue } from 'zustand/middleware'
+import type { InlineDataPart } from '@xiangfa/generative-ai'
 import storage from '@/utils/Storage'
 import { findIndex, omitBy, pick, isFunction } from 'lodash-es'
 
 type MessageStore = {
   title: string
   messages: Message[]
+  references: InlineDataPart[]
   summary: Summary
   systemInstruction: string
   systemInstructionEditMode: boolean
@@ -17,6 +19,8 @@ type MessageStore = {
   revoke: (id: string) => void
   instruction: (prompt: string, title?: string) => void
   setSystemInstructionEditMode: (open: boolean) => void
+  updateReference: (reference: InlineDataPart) => void
+  clearReference: () => void
   summarize: (ids: string[], content: string) => void
   changeChatLayout: (type: 'chat' | 'doc') => void
   setTitle: (title: string) => void
@@ -29,6 +33,7 @@ export const useMessageStore = create(
     (set, get) => ({
       title: '',
       messages: [],
+      references: [],
       summary: {
         ids: [],
         content: '',
@@ -74,6 +79,11 @@ export const useMessageStore = create(
       setSystemInstructionEditMode: (open) => {
         set(() => ({ systemInstructionEditMode: open }))
       },
+      updateReference: (reference) => {
+        const list = get().references
+        set({ references: [...list, reference] })
+      },
+      clearReference: () => set({ references: [] }),
       summarize: (ids, content) => {
         set(() => ({ summary: { ids, content } }))
       },

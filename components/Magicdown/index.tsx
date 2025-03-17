@@ -84,6 +84,11 @@ function Magicdown({ children: content, className, ...rest }: Options) {
             </a>
           )
         },
+        img: (props) => {
+          const { ...rest } = props
+          // eslint-disable-next-line
+          return <img loading="lazy" {...omit(rest, ['node'])} />
+        },
         ...components,
       }}
       urlTransform={(value: string) => value}

@@ -23,7 +23,7 @@
 }
 
 .markdown img {
-  @apply my-4 rounded-md;
+  @apply my-4 rounded-md bg-gray-100;
 }
 
 .markdown hr {

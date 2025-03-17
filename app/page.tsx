@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic'
 import { useRef, useState, useMemo, KeyboardEvent, useEffect, useCallback, useLayoutEffect } from 'react'
 import type { FunctionCall, InlineDataPart } from '@xiangfa/generative-ai'
 import { AudioRecorder, EdgeSpeech, getRecordMineType } from '@xiangfa/polly'
-import { Md5 } from 'ts-md5'
 import {
   MessageCircleHeart,
   AudioLines,
@@ -38,7 +37,7 @@ import type { FileManagerOptions } from '@/utils/FileManager'
 import { fileUpload, imageUpload } from '@/utils/upload'
 import { findOperationById } from '@/utils/plugin'
 import { generateImages, type ImageGenerationRequest } from '@/utils/generateImages'
-import { detectLanguage, formatTime, readFileAsDataURL, isOfficeFile } from '@/utils/common'
+import { detectLanguage, formatTime, readFileAsDataURL, base64ToBlob, isOfficeFile } from '@/utils/common'
 import { cn } from '@/utils'
 import { GEMINI_API_BASE_URL } from '@/constant/urls'
 import { OldVisionModel, OldTextModel } from '@/constant/model'
@@ -92,10 +91,10 @@ export default function Home() {
   const systemInstructionEditMode = useMessageStore((state) => state.systemInstructionEditMode)
   const chatLayout = useMessageStore((state) => state.chatLayout)
   const files = useAttachmentStore((state) => state.files)
+  const references = useMessageStore((state) => state.references)
   const model = useSettingStore((state) => state.model)
   const [textareaHeight, setTextareaHeight] = useState<number>(TEXTAREA_DEFAULT_HEIGHT)
   const [content, setContent] = useState<string>('')
-  const [references, setReferences] = useState<InlineDataPart[]>([])
   const [message, setMessage] = useState<string>('')
   const [thinkingMessage, setThinkingMessage] = useState<string>('')
   const [subtitle, setSubtitle] = useState<string>('')
@@ -111,7 +110,7 @@ export default function Home() {
   const conversationTitle = useMemo(() => (title ? title : t('chatAnything')), [title, t])
   const [status, setStatus] = useState<'thinkng' | 'silence' | 'talking'>('silence')
   const canUseMultimodalLive = useMemo(() => {
-    return model.startsWith('gemini-2.0-flash-exp')
+    return model.startsWith('gemini-2.0-flash-exp') && !model.includes('image')
   }, [model])
   const isOldVisionModel = useMemo(() => {
     return OldVisionModel.includes(model)
@@ -235,6 +234,32 @@ export default function Home() {
         const groundingSearchWriter = groundingSearchWritable.getWriter()
         onResponse(readable, thoughtReadable, inlineDataReadable, groundingSearchReadable)
 
+        const handleImage = async (part: InlineDataPart) => {
+          // Compress image
+          const { default: imageCompression } = await import('browser-image-compression')
+          const compressionOptions = {
+            maxSizeMB: 4,
+            useWebWorker: true,
+            initialQuality: 0.85,
+            maxWidthOrHeight: 1024,
+            fileType: 'image/jpeg',
+            libURL: 'scripts/browser-image-compression.js',
+          }
+          const tmpImageFile = await imageCompression.getFilefromDataUrl(
+            `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`,
+            'image.png',
+          )
+          const compressedImage = await imageCompression(tmpImageFile, compressionOptions)
+          const imageDataURL = await imageCompression.getDataUrlFromFile(compressedImage)
+          const inlineData = JSON.stringify({
+            mimeType: 'image/jpeg',
+            data: imageDataURL.split(';base64,')[1],
+          })
+          const { references } = useMessageStore.getState()
+          writer.write(`\n![image.jpg][image-${references.length}]\n`)
+          inlineDataWriter.write(inlineData)
+        }
+
         const functionCalls: FunctionCall[][] = []
 
         for await (const chunk of stream) {
@@ -242,7 +267,7 @@ export default function Home() {
 
           if (chunk.candidates) {
             const candidates: any[] = chunk.candidates
-            candidates.forEach((item) => {
+            for (const item of candidates) {
               if (item.content.parts) {
                 if (thinking) {
                   const textParts = item.content.parts.filter((item: any) => !isUndefined(item.text))
@@ -269,11 +294,8 @@ export default function Home() {
                     if (part.text) {
                       writer.write(part.text)
                     }
-                    if (part.inlineData) {
-                      const inlineData = JSON.stringify(part.inlineData)
-                      inlineDataWriter.write(inlineData)
-                      const imageMd5 = Md5.hashStr(inlineData)
-                      writer.write(`\n\n![${imageMd5}][image-${imageMd5}]\n\n`)
+                    if (part.inlineData?.mimeType.startsWith('image/')) {
+                      await handleImage(part)
                     }
                   }
                 }
@@ -283,7 +305,7 @@ export default function Home() {
               if (item.groundingMetadata) {
                 groundingSearchWriter.write(JSON.stringify(item.groundingMetadata))
               }
-            })
+            }
           }
 
           const calls = chunk.functionCalls()
@@ -344,7 +366,7 @@ export default function Home() {
       groundingSearchReadableStream: ReadableStream,
     ) => {
       const { lang, maxHistoryLength } = useSettingStore.getState()
-      const { summary, add: addMessage } = useMessageStore.getState()
+      const { summary, add: addMessage, clearReference } = useMessageStore.getState()
       speechQueue.current = new PromiseQueue()
       setSpeechSilence(false)
       let text = ''
@@ -385,7 +407,7 @@ export default function Home() {
           addMessage(message)
           setMessage('')
           setThinkingMessage('')
-          setReferences([])
+          clearReference()
           setIsThinking(false)
           stopGeneratingRef.current = false
           setExecutingPlugins([])
@@ -413,11 +435,12 @@ export default function Home() {
       simpleTextStream({
         readable: inlineDataReadableStream,
         onMessage: (content) => {
+          const { updateReference } = useMessageStore.getState()
           const inlineData: InlineDataPart['inlineData'] = JSON.parse(content)
           if (inlineData.mimeType.startsWith('image/')) {
             imageList.push({ inlineData })
           }
-          setReferences([...references, { inlineData }])
+          updateReference({ inlineData })
         },
       })
       simpleTextStream({
@@ -427,7 +450,7 @@ export default function Home() {
         },
       })
     },
-    [speech, summarize, setThinkingMessage, talkMode, references],
+    [speech, summarize, setThinkingMessage, talkMode],
   )
 
   const handleFunctionCall = useCallback(
